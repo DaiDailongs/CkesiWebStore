@@ -31,6 +31,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -74,6 +75,45 @@
         .nav-links a.active {
             color: #0078d4;
             border-bottom-color: #0078d4;
+        }
+
+        /* ==================== 新增：协议横幅 ==================== */
+        .protocol-banner {
+            background: #eef6fc;
+            border-left: 4px solid #0078d4;
+            padding: 10px 24px;
+            margin: 0 40px 10px 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 14px;
+            color: #1a1a1a;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .protocol-banner p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .protocol-banner .download-link {
+            background: #0078d4;
+            color: #fff;
+            padding: 4px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .protocol-banner .download-link:hover {
+            background: #106ebe;
         }
 
         /* ==================== 主内容区 ==================== */
@@ -339,8 +379,13 @@
         </ul>
     </header>
 
+    <!-- ==================== 协议横幅（新增） ==================== -->
+    <div class="protocol-banner">
+        <p>注意：下载软件前须阅读</p>
+        <a class="download-link" href="《Ckesi系列产品用户服务协议与隐私须知》.md" download>《Ckesi系列产品用户服务协议与隐私须知》</a>
+    </div>
+
     <!-- ==================== 主内容区 ==================== -->
-    <h1><strong>Created by CkesiStore</strong></h1>
     <!-- 主页 -->
     <main class="main page active" id="page-home">
         <h2 class="section-title">推荐应用</h2>
