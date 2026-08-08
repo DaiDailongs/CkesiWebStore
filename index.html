@@ -77,7 +77,7 @@
             border-bottom-color: #0078d4;
         }
 
-        /* ==================== 新增：协议横幅 ==================== */
+        /* ==================== 协议横幅 ==================== */
         .protocol-banner {
             background: #eef6fc;
             border-left: 4px solid #0078d4;
@@ -158,6 +158,7 @@
             flex-direction: column;
             gap: 12px;
             color: inherit;
+            position: relative;  /* 为红点定位 */
         }
 
         .app-card:hover {
@@ -243,6 +244,25 @@
 
         .app-btn:hover {
             background: #106ebe;
+        }
+
+        /* ==================== 新增：红色提示圆点 ==================== */
+        .red-dot {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 12px;
+            height: 12px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .red-dot.hidden {
+            opacity: 0;
         }
 
         /* ==================== APP详情弹窗 ==================== */
@@ -333,6 +353,28 @@
             color: #000;
         }
 
+        /* ==================== 详情按钮组 (新增) ==================== */
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .modal-actions .app-btn {
+            align-self: center;
+        }
+
+        /* 详细信息按钮（仅Win-Ver可见） */
+        .detail-btn {
+            background: #2c3e50;
+        }
+
+        .detail-btn:hover {
+            background: #1a2a3a;
+        }
+
         /* ==================== 关于页面 ==================== */
         .about-content {
             background: #fff;
@@ -362,6 +404,71 @@
             color: #999;
             font-size: 12px;
         }
+
+        /* ==================== 附加：详细信息弹窗 (Word内容) ==================== */
+        .detail-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail-modal-overlay.show {
+            display: flex;
+        }
+
+        .detail-modal-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #222;
+        }
+
+        .detail-modal-box h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #0078d4;
+            padding-bottom: 8px;
+        }
+
+        .detail-modal-box p {
+            margin-bottom: 12px;
+        }
+
+        .detail-modal-box strong {
+            color: #c0392b;
+        }
+
+        .detail-modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .detail-modal-close:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -379,7 +486,7 @@
         </ul>
     </header>
 
-    <!-- ==================== 协议横幅（新增） ==================== -->
+    <!-- ==================== 协议横幅 ==================== -->
     <div class="protocol-banner">
         <p>注意：下载软件前须阅读</p>
         <a class="download-link" href="《Ckesi系列产品用户服务协议与隐私须知》.md" download>《Ckesi系列产品用户服务协议与隐私须知》</a>
@@ -423,7 +530,27 @@
             <div class="modal-desc" id="modalDesc"></div>
             <div class="modal-intro" id="modalIntro"></div>
             <div class="modal-rating" id="modalRating"></div>
-            <a class="app-btn" id="modalDownload" href="#" target="_blank">免费下载</a>
+            <!-- 按钮区域：下载 + 详细信息（仅Win-Ver） -->
+            <div class="modal-actions" id="modalActions">
+                <a class="app-btn" id="modalDownload" href="#" target="_blank">免费下载</a>
+                <!-- 详细信息按钮由 JS 动态插入，以保持干净 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 详细信息弹窗 (Word文档内容) ==================== -->
+    <div class="detail-modal-overlay" id="detailModal">
+        <div class="detail-modal-box">
+            <button class="detail-modal-close" onclick="closeDetailModal()">✕</button>
+            <h2>关于应用"Win-Ver"改正及修改通知</h2>
+            <p>亲爱的用户，您好：</p>
+            <p>很抱歉地通知您，经内部技术复查，我们发现当前版本（Ver 3.0.1）在<strong>极端运行环境</strong>下（如安全模式、权限受限账户等）存在若干<strong>稳定性不足</strong>的问题，可能在特定情形下导致程序异常退出或系统响应异常。</p>
+            <p>我们高度重视产品质量与您的使用体验，已第一时间成立专项修复小组，对底层代码进行全面审计与加固。<strong>本次问题均非功能性缺陷，而是对特殊环境的容错能力不足</strong>，在正常桌面环境下使用不会受到影响。</p>
+            <p>我们已于 2026年8月6日 启动全面修复工作，预计 2026年8月16日 前完成修复并发布更新版本。在此期间，建议您在正常桌面环境下继续使用，当前版本功能完整可用。</p>
+            <p>若您在使用过程中遇到任何异常，可通过官方反馈渠道告知我们，以便我们更快定位边缘场景。</p>
+            <p>我们始终将软件质量与用户信任置于首位，此次暴露的问题将作为我们完善测试体系的宝贵经验。由此给您带来的不便，我们深表歉意，并承诺以更严谨的态度为您提供可靠的工具软件。</p>
+            <p>感谢您的理解与支持。</p>
+            <p style="margin-top:20px;">—— Ckesi Team<br>2026年8月6日</p>
         </div>
     </div>
 
@@ -434,16 +561,14 @@
 
     <script>
         // ==================== APP 数据 ====================
-        // 【可修改】在这里配置你的APP
         const apps = [
             {
                 name: "CkesiWin-Ver",
                 desc: "Windows版本查询工具",
-                //intro: "CkesiWin-Ver 是一款轻量级的 Windows 版本信息查询工具，帮助用户快速查看系统版本、更新状态，并提供历史版本下载入口。界面简洁，操作便捷。",
                 intro: "您好，Win-Ver软件现正在更新，您无法继续从官网下载使用，可在Github上下载，但可能有风险问题，我们推荐您等待片刻，使用最新的V4.0.1",
                 rating: 4.8,
-                icon: "1.ico",                              // 图标图片路径
-                link: "https://updateforckesi.netlify.app/"        // 跳转链接
+                icon: "1.ico",
+                link: "https://updateforckesi.netlify.app/"
             },
             {
                 name: "CkesiSnapPin",
@@ -452,14 +577,20 @@
                 rating: 5.0,
                 icon: "2.ico",
                 link: "https://ckesisnappin.netlify.app/"
-            },
+            }
         ];
+
+        // 记录哪些应用已经被点击过（用于隐藏红点）
+        const visitedApps = new Set();
 
         // ==================== 生成 APP 卡片 ====================
         function createAppCard(app) {
             const card = document.createElement("div");
             card.className = "app-card";
-            card.onclick = function() { openModal(app); };
+
+            // 只有 Win-Ver 才添加红点，并且如果已经被访问过则隐藏
+            const isWinVer = (app.name === "CkesiWin-Ver");
+            const alreadyVisited = visitedApps.has(app.name);
 
             card.innerHTML = `
                 <div class="card-top">
@@ -476,7 +607,22 @@
                 </div>
                 <div class="app-intro">${app.intro}</div>
                 <a class="app-btn" href="${app.link}" target="_blank" onclick="event.stopPropagation()">免费下载</a>
+                ${isWinVer ? `<div class="red-dot ${alreadyVisited ? 'hidden' : ''}"></div>` : ''}
             `;
+
+            // 点击卡片打开详情，并标记红点消失
+            card.addEventListener('click', function(e) {
+                // 如果点击的是下载按钮，不触发卡片事件（由按钮自身的stopPropagation处理）
+                if (e.target.closest('.app-btn')) return;
+                openModal(app);
+                // 如果是 Win-Ver 且尚未记录，则标记为已访问并隐藏红点
+                if (isWinVer && !visitedApps.has(app.name)) {
+                    visitedApps.add(app.name);
+                    const dot = card.querySelector('.red-dot');
+                    if (dot) dot.classList.add('hidden');
+                }
+            });
+
             return card;
         }
 
@@ -496,8 +642,11 @@
             appsGrid.innerHTML = "";
 
             apps.forEach(function(app) {
-                homeGrid.appendChild(createAppCard(app));
-                appsGrid.appendChild(createAppCard(app));
+                const card = createAppCard(app);
+                // 每个卡片独立克隆，用于两个网格
+                const cardClone = card.cloneNode(true);
+                homeGrid.appendChild(card);
+                appsGrid.appendChild(cardClone);
             });
         }
 
@@ -510,6 +659,26 @@
             document.getElementById("modalRating").innerHTML = 
                 '<span class="stars">' + getStars(app.rating) + '</span> ' + app.rating;
             document.getElementById("modalDownload").href = app.link;
+
+            // 处理详细信息按钮 (仅 Win-Ver)
+            const actionsDiv = document.getElementById("modalActions");
+            // 移除之前可能存在的详细信息按钮（保留下载按钮）
+            const existingDetailBtn = actionsDiv.querySelector('.detail-btn');
+            if (existingDetailBtn) existingDetailBtn.remove();
+
+            if (app.name === "CkesiWin-Ver") {
+                const detailBtn = document.createElement('a');
+                detailBtn.className = 'app-btn detail-btn';
+                detailBtn.textContent = '📄 详细信息';
+                detailBtn.href = '#';
+                detailBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openDetailModal();
+                });
+                actionsDiv.appendChild(detailBtn);
+            }
+
             document.getElementById("appModal").classList.add("show");
         }
 
@@ -520,6 +689,19 @@
 
         document.getElementById("appModal").addEventListener("click", function(e) {
             if (e.target === this) closeModal();
+        });
+
+        // ==================== 打开详细信息弹窗 (Word内容) ====================
+        function openDetailModal() {
+            document.getElementById("detailModal").classList.add("show");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.remove("show");
+        }
+
+        document.getElementById("detailModal").addEventListener("click", function(e) {
+            if (e.target === this) closeDetailModal();
         });
 
         // ==================== 页面切换 ====================
