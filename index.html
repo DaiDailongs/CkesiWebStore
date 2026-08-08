@@ -246,6 +246,18 @@
             background: #106ebe;
         }
 
+        /* Win-Ver 专用维护按钮样式 */
+        .app-btn.maintenance {
+            background: #e67e22;
+            cursor: default;
+            opacity: 0.8;
+            pointer-events: none; /* 不可点击 */
+        }
+
+        .app-btn.maintenance:hover {
+            background: #e67e22;
+        }
+
         /* ==================== 新增：红色提示圆点 ==================== */
         .red-dot {
             position: absolute;
@@ -568,7 +580,8 @@
                 intro: "您好，Win-Ver软件现正在更新，您无法继续从官网下载使用，可在Github上下载，但可能有风险问题，我们推荐您等待片刻，使用最新的V4.0.1",
                 rating: 4.8,
                 icon: "1.ico",
-                link: "https://updateforckesi.netlify.app/"
+                link: "https://updateforckesi.netlify.app/",
+                isMaintenance: true // 新增维护标记
             },
             {
                 name: "CkesiSnapPin",
@@ -576,7 +589,8 @@
                 intro: "CkesiSnapPin 是一款高效的截图工具，对于LTSC或Windows 7及以下等没有自带截图工具的用户。支持截图保存、剪贴板复制等功能，界面简洁易用。",
                 rating: 5.0,
                 icon: "2.ico",
-                link: "https://ckesisnappin.netlify.app/"
+                link: "https://ckesisnappin.netlify.app/",
+                isMaintenance: false
             }
         ];
 
@@ -588,9 +602,16 @@
             const card = document.createElement("div");
             card.className = "app-card";
 
-            // 只有 Win-Ver 才添加红点，并且如果已经被访问过则隐藏
             const isWinVer = (app.name === "CkesiWin-Ver");
             const alreadyVisited = visitedApps.has(app.name);
+
+            // 根据 isMaintenance 决定按钮文字和样式
+            let buttonHtml = '';
+            if (app.isMaintenance) {
+                buttonHtml = `<a class="app-btn maintenance" href="#" onclick="event.stopPropagation();">正在维护</a>`;
+            } else {
+                buttonHtml = `<a class="app-btn" href="${app.link}" target="_blank" onclick="event.stopPropagation()">免费下载</a>`;
+            }
 
             card.innerHTML = `
                 <div class="card-top">
@@ -606,16 +627,14 @@
                     </div>
                 </div>
                 <div class="app-intro">${app.intro}</div>
-                <a class="app-btn" href="${app.link}" target="_blank" onclick="event.stopPropagation()">免费下载</a>
+                ${buttonHtml}
                 ${isWinVer ? `<div class="red-dot ${alreadyVisited ? 'hidden' : ''}"></div>` : ''}
             `;
 
             // 点击卡片打开详情，并标记红点消失
             card.addEventListener('click', function(e) {
-                // 如果点击的是下载按钮，不触发卡片事件（由按钮自身的stopPropagation处理）
                 if (e.target.closest('.app-btn')) return;
                 openModal(app);
-                // 如果是 Win-Ver 且尚未记录，则标记为已访问并隐藏红点
                 if (isWinVer && !visitedApps.has(app.name)) {
                     visitedApps.add(app.name);
                     const dot = card.querySelector('.red-dot');
@@ -643,7 +662,6 @@
 
             apps.forEach(function(app) {
                 const card = createAppCard(app);
-                // 每个卡片独立克隆，用于两个网格
                 const cardClone = card.cloneNode(true);
                 homeGrid.appendChild(card);
                 appsGrid.appendChild(cardClone);
@@ -658,18 +676,30 @@
             document.getElementById("modalIntro").textContent = app.intro;
             document.getElementById("modalRating").innerHTML = 
                 '<span class="stars">' + getStars(app.rating) + '</span> ' + app.rating;
-            document.getElementById("modalDownload").href = app.link;
+
+            // 根据维护状态设置下载按钮
+            const downloadBtn = document.getElementById("modalDownload");
+            if (app.isMaintenance) {
+                downloadBtn.textContent = '正在维护';
+                downloadBtn.className = 'app-btn maintenance';
+                downloadBtn.href = '#';
+                downloadBtn.removeAttribute('target');
+            } else {
+                downloadBtn.textContent = '免费下载';
+                downloadBtn.className = 'app-btn';
+                downloadBtn.href = app.link;
+                downloadBtn.setAttribute('target', '_blank');
+            }
 
             // 处理详细信息按钮 (仅 Win-Ver)
             const actionsDiv = document.getElementById("modalActions");
-            // 移除之前可能存在的详细信息按钮（保留下载按钮）
             const existingDetailBtn = actionsDiv.querySelector('.detail-btn');
             if (existingDetailBtn) existingDetailBtn.remove();
 
             if (app.name === "CkesiWin-Ver") {
                 const detailBtn = document.createElement('a');
                 detailBtn.className = 'app-btn detail-btn';
-                detailBtn.textContent = '📄 详细信息';
+                detailBtn.textContent = '详细信息';
                 detailBtn.href = '#';
                 detailBtn.addEventListener('click', function(e) {
                     e.preventDefault();
