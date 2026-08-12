@@ -2,2347 +2,797 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CkesiRead V2.0.1</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js">
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CkesiStore</title>
+
     <style>
-        :root {
-            --bg-color: #f0ebe6;
-            --card-bg: rgba(255, 255, 255, 0.20);
-            --card-shadow: 0 40px 80px rgba(0, 0, 0, 0.05);
-            --card-border: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-            --btn-primary: #0b57d0;
-            --btn-primary-hover: #0a4bb8;
-            --text-primary: #222;
-            --text-secondary: #666;
-            --border-light: rgba(255, 255, 255, 0.6);
-            --bg-light: rgba(255, 255, 255, 0.4);
-            --danger: #b13b3b;
-            --radius-xl: 48px;
-            --radius-lg: 40px;
-            --radius-md: 30px;
-            --radius-sm: 16px;
-            --transition-fast: 0.2s;
-            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            --blur-strong: blur(35px);
-            --blur-light: blur(16px);
-        }
-        :root.dark-mode {
-            --bg-color: #1a1a1a;
-            --card-bg: rgba(30, 30, 30, 0.8);
-            --card-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
-            --card-border: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-            --btn-primary: #4a90d9;
-            --btn-primary-hover: #5aa0e9;
-            --text-primary: #eee;
-            --text-secondary: #aaa;
-            --border-light: rgba(255, 255, 255, 0.15);
-            --bg-light: rgba(255, 255, 255, 0.08);
-            --danger: #e05555;
-        }
+        /* ==================== 全局样式 ==================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "HarmonyOS Sans", Roboto, sans-serif;
-            background: var(--bg-color);
+            font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+            background: #f3f3f3;
+            color: #1a1a1a;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background 0.3s;
         }
-        #customToast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 14px 28px;
-            border-radius: var(--radius-lg);
-            font-size: 0.95rem;
-            font-weight: 500;
-            z-index: 99999;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: var(--blur-light);
-            color: #333;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-            transition: all var(--transition-smooth);
-            opacity: 0;
-            pointer-events: none;
-        }
-        #customToast.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        #customToast.error {
-            background: rgba(255, 230, 230, 0.95);
-            border-color: #ff6b6b;
-            color: #a33;
-        }
-        #customConfirmOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100001;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s;
-        }
-        #customConfirmOverlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        #customConfirmBox {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 2rem 1.8rem 1.5rem;
-            max-width: 360px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            transform: scale(0.9);
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #customConfirmOverlay.active #customConfirmBox {
-            transform: scale(1);
-        }
-        #customConfirmMsg {
-            font-size: 0.95rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            font-weight: 500;
-            white-space: pre-wrap;
-        }
-        #customConfirmBtns {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        #customConfirmBtns button {
-            padding: 0.55rem 2rem;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-            min-width: 90px;
-        }
-        #customConfirmBtns button:active {
-            transform: scale(0.95);
-        }
-        #customConfirmOk {
-            background: #0b57d0;
-            color: #fff;
-        }
-        #customConfirmOk:hover {
-            background: #0a4bb8;
-        }
-        #customConfirmCancel {
-            background: rgba(0, 0, 0, 0.06);
-            color: #555;
-        }
-        #customConfirmCancel:hover {
-            background: rgba(0, 0, 0, 0.12);
-        }
-        #customConfirmOk.danger-confirm {
-            background: #b13b3b;
-        }
-        #customConfirmOk.danger-confirm:hover {
-            background: #9a3333;
-        }
-        #boot-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100000;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
-            opacity: 1;
-            visibility: visible;
-        }
-        #boot-animation.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .boot-logo-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin-bottom: 2rem;
-        }
-        .boot-orbital-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            animation: bootOrbit 3s linear infinite;
-        }
-        .boot-orbital-ring:nth-child(1) {
-            width: 120px;
-            height: 120px;
-            margin: -60px 0 0 -60px;
-        }
-        .boot-orbital-ring:nth-child(2) {
-            width: 90px;
-            height: 90px;
-            margin: -45px 0 0 -45px;
-            animation-duration: 2.2s;
-            animation-direction: reverse;
-            border-color: rgba(11, 87, 208, 0.3);
-        }
-        .boot-orbital-ring:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            margin: -30px 0 0 -30px;
-            animation-duration: 1.6s;
-            border-color: rgba(255, 255, 255, 0.25);
-        }
-        .boot-core-dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
+
+        /* ==================== 顶部导航栏 ==================== */
+        .header {
             background: #fff;
-            border-radius: 50%;
-            top: -4px;
-            left: 50%;
-            margin-left: -4px;
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 24px rgba(11, 87, 208, 0.6);
-        }
-        .boot-ring-2 .boot-core-dot {
-            background: #0b57d0;
-            box-shadow: 0 0 12px rgba(11, 87, 208, 0.8);
-        }
-        @keyframes bootOrbit {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .boot-brand-text {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 4px;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #fff 0%, #a0c4ff 50%, #fff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .boot-sub-text {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 2px;
-        }
-        .boot-progress-track {
-            width: 200px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 2.5rem;
-            overflow: hidden;
-        }
-        .boot-progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #0b57d0, #6ea8fe, #fff);
-            border-radius: 2px;
-            animation: bootProgressFill 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes bootProgressFill {
-            0% {
-                width: 0%;
-            }
-            100% {
-                width: 100%;
-            }
-        }
-        .glass-card {
-            width: 100%;
-            max-width: 880px;
-            min-height: 600px;
-            max-height: 90vh;
-            background: var(--card-bg);
-            backdrop-filter: var(--blur-strong);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--card-shadow), var(--card-border);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: auto;
-            transition: background 0.3s, box-shadow 0.3s;
-        }
-        #login-interface {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            flex: 1;
-            gap: 1.2rem;
-            padding-top: 1rem;
-            overflow-y: auto;
-        }
-        .login-title {
-            font-size: 2.2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            flex-shrink: 0;
-        }
-        .login-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            text-align: center;
-            line-height: 1.6;
-            flex-shrink: 0;
-        }
-        .import-box {
-            width: 100%;
-            max-width: 360px;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            flex-shrink: 0;
-        }
-        .btn-blue {
-            background: var(--btn-primary);
-            border: none;
-            border-radius: var(--radius-lg);
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-            width: 100%;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-        .btn-blue:hover {
-            background: var(--btn-primary-hover);
-        }
-        .btn-blue:active {
-            transform: scale(0.95);
-        }
-        .btn-blue.outline {
-            background: transparent;
-            border: 1px solid var(--btn-primary);
-            color: var(--btn-primary);
-        }
-        .btn-blue.outline:hover {
-            background: rgba(11, 87, 208, 0.1);
-        }
-        .btn-sm {
-            padding: 0.35rem 1rem;
-            font-size: 0.8rem;
-            width: auto;
-            min-width: auto;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--btn-primary);
-            background: transparent;
-            color: var(--btn-primary);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition-fast);
-            white-space: nowrap;
-        }
-        .btn-sm:hover {
-            background: rgba(11, 87, 208, 0.1);
-        }
-        #login-form-area,
-        #register-form-area {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            width: 100%;
-            max-width: 360px;
-            flex-shrink: 0;
-        }
-        #login-form-area.active,
-        #register-form-area.active {
-            display: flex;
-        }
-        .login-input {
-            width: 100%;
-            padding: 0.7rem 1.2rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.5);
-            font-size: 0.95rem;
-            outline: none;
-            transition: var(--transition-fast);
-        }
-        .login-input:focus {
-            border-color: var(--btn-primary);
-            background: rgba(255, 255, 255, 0.8);
-        }
-        .input-row {
-            display: flex;
-            gap: 0.5rem;
-            width: 100%;
-        }
-        .input-row .login-input {
-            flex: 1;
-        }
-        #app-container {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-        }
-        #view-home {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-        #view-reader {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-        }
-        .app-topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-        }
-        .app-status {
-            flex: 1;
-            background: var(--bg-light);
-            border-radius: var(--radius-lg);
-            padding: 0.6rem 1.5rem;
-            text-align: center;
-            border: 1px solid var(--border-light);
-            font-weight: 500;
-            margin-right: 1rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-primary);
-        }
-        .icon-btn {
-            font-size: 1.5rem;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            padding: 10px;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            padding: 12px 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--text-primary);
-        }
-        .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .icon-btn:active {
-            transform: scale(0.9);
-        }
-        .action-zone {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
         }
-        .action-btn {
-            background: var(--btn-primary);
-            border: none;
-            border-radius: var(--radius-lg);
-            padding: 0.6rem 2.5rem;
-            font-size: 1rem;
+
+        .logo {
+            font-size: 22px;
             font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            min-width: 100px;
-        }
-        .action-btn:hover {
-            background: var(--btn-primary-hover);
-        }
-        .action-btn:active {
-            transform: scale(0.95);
-        }
-        .action-btn:disabled {
-            background: #b0b0b0;
-            color: #888;
-            cursor: not-allowed;
-            opacity: 0.5;
-            pointer-events: none;
-            box-shadow: none;
-        }
-        .action-btn.danger-btn {
-            background: var(--danger);
-        }
-        .action-btn.danger-btn:hover {
-            background: #9a3333;
-        }
-        .file-pool-area {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: var(--radius-md);
-            padding: 0.8rem 1rem;
-            border: 1px solid var(--border-light);
-            min-height: 60px;
-            margin-bottom: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            align-items: flex-start;
-            gap: 10px;
-            flex: 1;
-            max-height: 320px;
-            overflow-y: auto;
-        }
-        .file-pool-item {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 0.4rem 1.2rem;
-            border-radius: var(--radius-md);
-            border: 2px solid transparent;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            white-space: nowrap;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            position: relative;
-            height: fit-content;
-        }
-        .file-pool-item:hover {
-            background: rgba(255, 255, 255, 0.8);
-            transform: translateY(-1px);
-        }
-        .file-pool-item.selected {
-            border-color: var(--btn-primary);
-            background: rgba(11, 87, 208, 0.15);
-            color: var(--btn-primary);
-            transform: scale(1.02);
-        }
-        .file-pool-item.bookmarked {
-            border-color: #e8a010;
-            background: rgba(232, 160, 16, 0.1);
-        }
-        .file-pool-item.bookmarked::before {
-            content: '⭐';
-            position: absolute;
-            top: -6px;
-            right: -4px;
-            font-size: 0.7rem;
-            z-index: 3;
-        }
-        .file-pool-item::after {
-            content: '双击打开';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            opacity: 0;
-            transition: var(--transition-fast);
-            pointer-events: none;
-            white-space: nowrap;
-            z-index: 5;
-        }
-        .file-pool-item:hover::after {
-            opacity: 1;
-            bottom: -25px;
-        }
-        .file-pool-empty {
-            color: #999;
-            font-size: 0.9rem;
-            padding-left: 0.5rem;
-        }
-        .file-pool-count {
-            color: #888;
-            font-size: 0.8rem;
-            margin-left: auto;
-            align-self: flex-end;
-        }
-        .progress-box {
-            background: var(--bg-light);
-            border-radius: var(--radius-md);
-            padding: 1rem 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            flex-shrink: 0;
-        }
-        .progress-box.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .p-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.08);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .p-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--btn-primary);
-            border-radius: 10px;
-            transition: width 0.1s;
-        }
-        .reader-top-50 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            gap: 10px;
-        }
-        .reader-title-half {
-            flex: 2;
-            background: var(--bg-light);
-            border-radius: var(--radius-lg);
-            padding: 0.4rem 1.5rem;
-            text-align: center;
-            font-weight: 500;
-            border: 1px solid var(--border-light);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
-            color: var(--text-primary);
-        }
-        .btn-return-half {
-            flex: 1;
-            background: var(--btn-primary);
-            border: none;
-            border-radius: var(--radius-lg);
-            padding: 0.4rem 1.5rem;
-            color: #fff;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: var(--transition-fast);
-        }
-        .btn-return-half:hover {
-            background: var(--btn-primary-hover);
-        }
-        .reader-box {
-            flex: 1;
-            background: rgba(245, 240, 235, 0.4);
-            border-radius: 36px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            transition: background var(--transition-fast), color var(--transition-fast);
-            min-height: 350px;
-            overflow: hidden;
-        }
-        .reader-content {
-            flex: 1;
-            line-height: 2.0;
-            white-space: pre-wrap;
-            overflow-y: auto;
-            transition: font-size var(--transition-fast), color var(--transition-fast);
-            padding-bottom: 2rem;
-        }
-        .search-highlight {
-            background: #ffe066;
-            border-radius: 3px;
-            padding: 0 2px;
-        }
-        .search-highlight.current {
-            background: #ffa500;
-            outline: 2px solid #e07000;
-        }
-        .reader-search-bar {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .reader-search-bar input {
-            flex: 1;
-            padding: 0.35rem 0.8rem;
-            border-radius: 20px;
-            border: 1px solid var(--border-light);
-            background: var(--bg-light);
-            font-size: 0.85rem;
-            outline: none;
-            color: var(--text-primary);
-        }
-        .reader-search-bar button {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.8rem;
-            background: var(--btn-primary);
-            color: #fff;
-        }
-        .reader-search-bar span {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        .reader-stats-bar {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.3rem;
-            flex-shrink: 0;
-        }
-        .reader-page {
-            position: absolute;
-            bottom: 1.2rem;
-            right: 1.5rem;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 0.2rem 1.2rem;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            z-index: 2;
-        }
-        .reader-bottom-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2.5rem;
-            margin-top: 1.2rem;
-            position: relative;
-        }
-        .arrow-btn {
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid #fff;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-        .arrow-btn:hover {
-            background: rgba(255, 255, 255, 0.7);
-        }
-        .arrow-btn:active {
-            transform: scale(0.95);
-        }
-        .arrow-btn.disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        .bottom-unicode-wrap {
-            position: absolute;
-            right: 0;
+            color: #0078d4;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #444;
-        }
-        .toggle-track {
-            width: 50px;
-            height: 28px;
-            background: rgba(180, 180, 180, 0.5);
-            border-radius: var(--radius-lg);
-            position: relative;
             cursor: pointer;
-            transition: 0.3s;
-            border: 1px solid #fff;
         }
-        .toggle-track.active {
-            background: var(--btn-primary);
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #0078d4;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
         }
-        .toggle-thumb {
-            width: 22px;
-            height: 22px;
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #444;
+            font-size: 14px;
+            padding: 6px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #0078d4;
+            border-bottom-color: #0078d4;
+        }
+
+        /* ==================== 协议横幅 ==================== */
+        .protocol-banner {
+            background: #eef6fc;
+            border-left: 4px solid #0078d4;
+            padding: 10px 24px;
+            margin: 0 40px 10px 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 14px;
+            color: #1a1a1a;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .protocol-banner p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .protocol-banner .download-link {
+            background: #0078d4;
+            color: #fff;
+            padding: 4px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .protocol-banner .download-link:hover {
+            background: #106ebe;
+        }
+
+        /* ==================== 主内容区 ==================== */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 40px;
+        }
+
+        /* ==================== 页面区域 ==================== */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ==================== 标题区 ==================== */
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        /* ==================== APP 卡片网格 ==================== */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* ==================== APP 卡片 ==================== */
+        .app-card {
             background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: inherit;
+            position: relative;
+        }
+
+        .app-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* ==================== APP 图标 ==================== */
+        .app-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ==================== APP 信息 ==================== */
+        .app-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .app-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .app-desc {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .app-rating {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .app-rating .stars {
+            color: #ffb900;
+        }
+
+        /* ==================== 卡片简介 ==================== */
+        .app-intro {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ==================== 按钮通用样式 ==================== */
+        .app-btn {
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        .app-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 下载按钮 */
+        .app-btn.download {
+            background: #0078d4;
+        }
+        .app-btn.download:hover {
+            background: #106ebe;
+        }
+
+        /* 维护按钮 */
+        .app-btn.maintenance {
+            background: #e67e22;
+            cursor: default;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        .app-btn.maintenance:hover {
+            background: #e67e22;
+        }
+
+        /* 获取按钮（跳转网页） */
+        .app-btn.web {
+            background: #8e44ad;
+        }
+        .app-btn.web:hover {
+            background: #6c3483;
+        }
+
+        /* ==================== 红色提示圆点 ==================== */
+        .red-dot {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 12px;
+            height: 12px;
+            background-color: #e74c3c;
             border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            transition: 0.3s;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+            pointer-events: none;
         }
-        .toggle-track.active .toggle-thumb {
-            left: 24px;
+
+        .red-dot.hidden {
+            opacity: 0;
         }
-        #settings-interface {
-            position: absolute;
+
+        /* ==================== APP详情弹窗 ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(240, 235, 230, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            display: none;
-            flex-direction: column;
-            z-index: 10;
-            overflow: hidden;
-        }
-        #settings-interface.active {
-            display: flex;
-        }
-        .settings-layout {
-            display: flex;
-            flex: 1;
-            gap: 1.5rem;
-            overflow: hidden;
-        }
-        .settings-sidebar {
-            width: 180px;
-            flex-shrink: 0;
-            border-right: 1px solid rgba(255, 255, 255, 0.4);
-            padding-right: 1.5rem;
-            overflow-y: auto;
-        }
-        .set-nav-item {
-            display: flex;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
             align-items: center;
-            padding: 0.7rem 1rem;
-            margin-bottom: 0.3rem;
-            border-radius: 12px;
-            color: #444;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-size: 0.9rem;
-            min-height: 44px;
         }
-        .set-nav-item:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .set-nav-item.active {
-            background: rgba(11, 87, 208, 0.15);
-            color: var(--btn-primary);
-        }
-        .settings-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 1rem;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        .set-panel {
-            display: none;
-            animation: fadeIn 0.2s;
-        }
-        .set-panel.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .set-group {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-sm);
-        }
-        .set-label {
-            display: block;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .set-row {
+
+        .modal-overlay.show {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
         }
-        .styled-select-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 240px;
-        }
-        .styled-select-wrapper select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 100%;
-            padding: 0.5rem 2.5rem 0.5rem 1rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            background: var(--bg-light);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: var(--radius-lg);
-            outline: none;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-        .styled-select-wrapper select:hover {
-            background: rgba(255, 255, 255, 0.6);
-        }
-        .styled-select-wrapper select:focus {
-            border-color: var(--btn-primary);
-            box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.1);
-        }
-        .styled-select-wrapper::after {
-            content: '▾';
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            pointer-events: none;
-        }
-        input[type="color"] {
-            width: 44px;
-            height: 44px;
-            border: 2px solid #fff;
-            border-radius: 12px;
-            padding: 2px;
-            cursor: pointer;
+
+        .modal-box {
             background: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        input[type="number"] {
-            background: var(--bg-light);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: var(--radius-md);
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            outline: none;
-            max-width: 80px;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
             text-align: center;
+            position: relative;
         }
-        input[type="number"]:focus {
-            border-color: var(--btn-primary);
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 18px;
+            margin: 0 auto 16px;
+            overflow: hidden;
         }
-        .preview-box {
-            margin-top: 1rem;
-            padding: 0.8rem 1.2rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            background: #f5f0eb;
-            transition: all var(--transition-fast);
-            min-height: 60px;
+
+        .modal-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .set-panel input[type="text"],
-        .set-panel input[type="password"],
-        .set-panel input[type="number"] {
-            background: var(--bg-light);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: var(--radius-md);
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            outline: none;
+
+        .modal-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        .set-panel input[type="text"]:focus,
-        .set-panel input[type="password"]:focus,
-        .set-panel input[type="number"]:focus {
-            border-color: var(--btn-primary);
+
+        .modal-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
         }
-        .set-checkbox-row {
+
+        .modal-intro {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .modal-rating {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .modal-rating .stars {
+            color: #ffb900;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        .modal-actions {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 6px 0;
-            min-height: 44px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 6px;
         }
-        .set-checkbox-row input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--btn-primary);
+
+        .modal-actions .app-btn {
+            align-self: center;
         }
+
+        .detail-btn {
+            background: #2c3e50;
+        }
+        .detail-btn:hover {
+            background: #1a2a3a;
+        }
+
+        /* ==================== 关于页面 ==================== */
+        .about-content {
+            background: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            line-height: 1.8;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .about-content h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .about-content a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        /* ==================== 页脚 ==================== */
         .footer {
             text-align: center;
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 1rem;
+            padding: 30px;
+            color: #999;
+            font-size: 12px;
         }
-        .danger {
-            background: var(--danger) !important;
+
+        /* ==================== 详细信息弹窗 ==================== */
+        .detail-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
         }
-        .pool-full {
-            color: var(--danger);
-            font-weight: 600;
+
+        .detail-modal-overlay.show {
+            display: flex;
         }
-        .search-box {
-            width: 100%;
-            margin-bottom: 0.8rem;
-            flex-shrink: 0;
+
+        .detail-modal-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #222;
         }
-        .search-box input {
-            width: 100%;
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            outline: none;
-            transition: var(--transition-fast);
+
+        .detail-modal-box h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #0078d4;
+            padding-bottom: 8px;
         }
-        .search-box input:focus {
-            border-color: var(--btn-primary);
-            background: rgba(255, 255, 255, 0.8);
+
+        .detail-modal-box p {
+            margin-bottom: 12px;
         }
-        .btn-small {
-            padding: 0.3rem 1.2rem;
-            font-size: 0.85rem;
-            min-width: auto;
-            border-radius: var(--radius-lg);
+
+        .detail-modal-box strong {
+            color: #c0392b;
+        }
+
+        .detail-modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition-fast);
+            color: #888;
+            margin-bottom: 8px;
         }
-        .btn-small:active {
-            transform: scale(0.95);
-        }
-        @media (max-width: 768px) {
-            body {
-                padding: 0.5rem;
-                align-items: flex-start;
-            }
-            .glass-card {
-                border-radius: 32px;
-                padding: 1.5rem;
-                min-height: auto;
-                max-height: 95vh;
-            }
-            .settings-layout {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .settings-sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-                padding-right: 0;
-                padding-bottom: 0.5rem;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.3rem;
-                overflow-x: auto;
-                overflow-y: hidden;
-            }
-            .set-nav-item {
-                white-space: nowrap;
-                flex-shrink: 0;
-                min-height: 36px;
-                padding: 0.5rem 0.8rem;
-                font-size: 0.85rem;
-            }
-            .action-zone {
-                gap: 0.8rem;
-            }
-            .action-btn {
-                padding: 0.5rem 1.5rem;
-                font-size: 0.9rem;
-                min-width: 80px;
-            }
-            .file-pool-item {
-                max-width: 120px;
-                font-size: 0.8rem;
-            }
-            .reader-top-50 {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .reader-title-half,
-            .btn-return-half {
-                flex: none;
-                width: 100%;
-            }
-            .reader-bottom-bar {
-                gap: 1.5rem;
-            }
-            .bottom-unicode-wrap {
-                position: static;
-                margin-top: 0.5rem;
-                justify-content: center;
-            }
-            .file-pool-area {
-                max-height: 250px;
-            }
-        }
-        @media (max-width: 480px) {
-            .glass-card {
-                border-radius: 24px;
-                padding: 1rem;
-            }
-            .login-title {
-                font-size: 1.8rem;
-            }
-            .settings-sidebar {
-                gap: 0.2rem;
-            }
-            .set-nav-item {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.8rem;
-                min-height: 32px;
-            }
+
+        .detail-modal-close:hover {
+            color: #000;
         }
     </style>
 </head>
 <body>
-    <div id="boot-animation">
-        <div class="boot-logo-container">
-            <div class="boot-orbital-ring boot-ring-1"><div class="boot-core-dot"></div></div>
-            <div class="boot-orbital-ring boot-ring-2"><div class="boot-core-dot"></div></div>
-            <div class="boot-orbital-ring boot-ring-3"><div class="boot-core-dot"></div></div>
+
+    <!-- ==================== 顶部导航栏 ==================== -->
+    <header class="header">
+        <div class="logo" onclick="showPage('home')">
+            <div class="logo-icon">C</div>
+            CkesiStore
         </div>
-        <div class="boot-brand-text">CkesiRead</div>
-        <div class="boot-sub-text">纯净阅读 · 畅享丝滑</div>
-        <div class="boot-progress-track">
-            <div class="boot-progress-fill"></div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" data-page="home" onclick="showPage('home')">主页</a></li>
+            <li><a href="#" data-page="apps" onclick="showPage('apps')">应用</a></li>
+            <li><a href="#" data-page="about" onclick="showPage('about')">关于</a></li>
+        </ul>
+    </header>
+
+    <!-- ==================== 协议横幅 ==================== -->
+    <div class="protocol-banner">
+        <p>注意：下载软件前须阅读</p>
+        <a class="download-link" href="《Ckesi系列产品用户服务协议与隐私须知》.md" download>《Ckesi系列产品用户服务协议与隐私须知》</a>
+    </div>
+
+    <!-- ==================== 主内容区 ==================== -->
+    <main class="main page active" id="page-home">
+        <h2 class="section-title">推荐应用</h2>
+        <div class="app-grid" id="homeAppGrid"></div>
+    </main>
+
+    <main class="main page" id="page-apps">
+        <h2 class="section-title">全部应用</h2>
+        <div class="app-grid" id="appsAppGrid"></div>
+    </main>
+
+    <main class="main page" id="page-about">
+        <h2 class="section-title">关于 CkesiStore</h2>
+        <div class="about-content">
+            <h3>CkesiStore</h3>
+            <p>一个轻量级的应用商城，提供实用工具下载。</p>
+            <p>本作品在 <a href="https://github.com/DaiDailongs" target="_blank">GitHub</a> 完全开源。</p>
+            <p>任何收费与仿冒的均为抄袭，请及时反馈。</p>
+            <br>
+            <p>反馈与加入：<strong>DaiDailongs@outlook.com</strong></p>
+            <p>项目地址：<a href="https://github.com/DaiDailongs/" target="_blank">github.com/DaiDailongs/</a></p>
+        </div>
+    </main>
+
+    <!-- ==================== APP详情弹窗 ==================== -->
+    <div class="modal-overlay" id="appModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-icon" id="modalIcon">
+                <img src="" alt="图标">
+            </div>
+            <div class="modal-name" id="modalName"></div>
+            <div class="modal-desc" id="modalDesc"></div>
+            <div class="modal-intro" id="modalIntro"></div>
+            <div class="modal-rating" id="modalRating"></div>
+            <div class="modal-actions" id="modalActions">
+                <a class="app-btn" id="modalDownload" href="#" target="_blank">免费下载</a>
+            </div>
         </div>
     </div>
-    <div id="customToast"></div>
-    <div id="customConfirmOverlay">
-        <div id="customConfirmBox">
-            <div id="customConfirmMsg"></div>
-            <div id="customConfirmBtns">
-                <button id="customConfirmCancel">取消</button>
-                <button id="customConfirmOk">确认</button>
+
+    <!-- ==================== 详细信息弹窗 ==================== -->
+    <div class="detail-modal-overlay" id="detailModal">
+        <div class="detail-modal-box">
+            <button class="detail-modal-close" onclick="closeDetailModal()">✕</button>
+            <h2>关于应用"Win-Ver"改正及修改通知</h2>
+            <p>亲爱的用户，您好：</p>
+            <p>很抱歉地通知您，经内部技术复查，我们发现当前版本（Ver 3.0.1）在<strong>极端运行环境</strong>下（如安全模式、权限受限账户等）存在若干<strong>稳定性不足</strong>的问题，可能在特定情形下导致程序异常退出或系统响应异常。</p>
+            <p>我们高度重视产品质量与您的使用体验，已第一时间成立专项修复小组，对底层代码进行全面审计与加固。<strong>本次问题均非功能性缺陷，而是对特殊环境的容错能力不足</strong>，在正常桌面环境下使用不会受到影响。</p>
+            <p>我们已于 2026年8月6日 启动全面修复工作，预计 2026年8月16日 前完成修复并发布更新版本。在此期间，建议您在正常桌面环境下继续使用，当前版本功能完整可用。</p>
+            <p>若您在使用过程中遇到任何异常，可通过官方反馈渠道告知我们，以便我们更快定位边缘场景。</p>
+            <p>我们始终将软件质量与用户信任置于首位，此次暴露的问题将作为我们完善测试体系的宝贵经验。由此给您带来的不便，我们深表歉意，并承诺以更严谨的态度为您提供可靠的工具软件。</p>
+            <p>感谢您的理解与支持。</p>
+            <p style="margin-top:20px;">—— Ckesi Team<br>2026年8月6日</p>
+        </div>
+    </div>
+
+    <!-- ==================== 页脚 ==================== -->
+    <footer class="footer">
+        © 2026 CkesiStore - 在GitHub完全开源 | 反馈：DaiDailongs@outlook.com
+    </footer>
+
+    <script>
+        // ==================== APP 数据 ====================
+        const apps = [
+            {
+                name: "CkesiWin-Ver",
+                desc: "Windows版本查询工具",
+                intro: "您好，Win-Ver软件现正在更新，您无法继续从官网下载使用，可在Github上下载，但可能有风险问题，我们推荐您等待片刻，使用最新的V4.0.1",
+                rating: 4.8,
+                icon: "1.ico",
+                link: "https://updateforckesi.netlify.app/",
+                isMaintenance: false,
+                actionType: "download"   // download | web | maintenance
+            },
+            {
+                name: "CkesiSnapPin",
+                desc: "截图工具",
+                intro: "CkesiSnapPin 是一款高效的截图工具，对于LTSC或Windows 7及以下等没有自带截图工具的用户。支持截图保存、剪贴板复制等功能，界面简洁易用。",
+                rating: 5.0,
+                icon: "2.ico",
+                link: "https://ckesisnappin.netlify.app/",
+                isMaintenance: false,
+                actionType: "download"
+            },
+            {
+                name: "CkesiRead",
+                desc: "阅读器",
+                intro: "线上阅读，畅享流畅",
+                rating: 0,
+                icon: "",
+                link: "https://ckesiread.netlify.app/",
+                isMaintenance: false,
+                actionType: "web"   // 这个就是“获取”按钮
+            }
+        ];
+
+        const visitedApps = new Set();
+
+        // ==================== 星级转换 ====================
+        function getStars(rating) {
+            if (rating >= 4.8) return "★★★★★";
+            if (rating >= 4.3) return "★★★★☆";
+            if (rating >= 3.8) return "★★★☆☆";
+            if (rating >= 2.3) return "★★☆☆☆";
+            if (rating >= 0.8) return "★☆☆☆☆";
+            if (rating == 0.0) return "-暂无评分-";
+            return "☆☆☆☆☆";
+        }
+
+        // ==================== 生成 APP 卡片 ====================
+        function createAppCard(app) {
+            const card = document.createElement("div");
+            card.className = "app-card";
+
+            const isWinVer = (app.name === "CkesiWin-Ver");
+            const alreadyVisited = visitedApps.has(app.name);
+
+            // ---- 按钮逻辑 ----
+            let btnClass = "";
+            let btnText = "";
+            let btnLink = app.link || "#";
+            let btnTarget = '_blank';
+            let btnOnclick = "";
+
+            if (app.actionType === "web") {
+                btnClass = "app-btn web";
+                btnText = "获取";
+                // 点击跳转网站
+                btnLink = app.link;
+            } else if (app.isMaintenance) {
+                btnClass = "app-btn maintenance";
+                btnText = "正在维护";
+                btnLink = "#";
+                btnTarget = '';
+                btnOnclick = "event.stopPropagation();";
+            } else {
+                btnClass = "app-btn download";
+                btnText = "免费下载";
+                btnLink = app.link;
+            }
+
+            const buttonHtml = `<a class="${btnClass}" href="${btnLink}" target="${btnTarget}" onclick="${btnOnclick}event.stopPropagation();">${btnText}</a>`;
+
+            card.innerHTML = `
+    <div class="card-top">
+        ${app.icon ? `<div class="app-icon"><img src="${app.icon}" alt="${app.name}"></div>` : ''}
+        <div class="app-info">
+            <div class="app-name">${app.name}</div>
+            <div class="app-desc">${app.desc}</div>
+            <div class="app-rating">
+                <span class="stars">${getStars(app.rating)}</span> ${app.rating}
             </div>
         </div>
     </div>
-    <input type="file" id="fileInputDoc" accept=".txt,.docx,.log,.md,.json,.xml,.html,text/plain" style="display:none;">
-    <input type="file" id="fileInputCks" accept=".cks" style="display:none;">
-    <div class="glass-card">
-        <div id="login-interface">
-            <div class="login-title">CkesiRead</div>
-            <div class="login-subtitle" id="loginSubtitle">注册新账号，或导入已有的配置文件</div>
-            <div class="import-box" id="login-buttons">
-                <button class="btn-blue" id="btnRegister">注册新账号</button>
-                <button class="btn-blue outline" id="btnImportCks">导入配置文件 (.cks)</button>
-            </div>
-            <div id="login-form-area">
-                <input type="text" class="login-input" id="loginUsername" placeholder="用户名">
-                <input type="password" class="login-input" id="loginPassword" placeholder="密码">
-                <button class="btn-blue" id="btnLoginSubmit">登录</button>
-                <button class="btn-blue outline" id="btnLoginCancel">返回</button>
-            </div>
-            <div id="register-form-area">
-                <div class="set-label" style="align-self:flex-start;">设置用户名</div>
-                <div class="input-row">
-                    <input type="text" class="login-input" id="regUsername" placeholder="用户名">
-                    <button class="btn-sm" id="btnRandomName">随机</button>
-                </div>
-                <div class="set-label" style="align-self:flex-start;">设置密码</div>
-                <input type="password" class="login-input" id="regPassword" placeholder="密码">
-                <button class="btn-blue" id="btnRegisterConfirm">确认注册</button>
-                <button class="btn-blue outline" id="btnRegisterBack">返回</button>
-            </div>
-        </div>
-        <div id="app-container">
-            <div id="view-home">
-                <div class="app-topbar">
-                    <div class="app-status" id="mainStatusDisplay">等待上传文件...</div>
-                    <button class="icon-btn" id="btnBookmarkToggle" title="收藏/取消收藏">⭐</button>
-                    <button class="icon-btn" id="openSettingsBtn">⚙️</button>
-                </div>
-                <div class="action-zone">
-                    <button class="action-btn" id="uploadBtn">上传</button>
-                    <button class="action-btn" id="confirmBtn" disabled>确认</button>
-                    <button class="action-btn disabled-btn danger-btn" id="deleteBtn">删除此文件</button>
-                </div>
-                <div class="search-box">
-                    <input type="text" id="poolSearchInput" placeholder="搜索文件池...">
-                </div>
-                <div class="file-pool-area" id="filePoolArea">
-                    <span class="file-pool-empty" id="poolEmptyText">暂无文件，点击上方"上传"添加。</span>
-                    <span class="file-pool-count" id="poolCountDisplay">(0/20)</span>
-                </div>
-                <div class="progress-box" id="uploadProgressBox">
-                    <div style="font-size: 0.9rem;">
-                        <span id="progressTextStatus">正在上传文件</span><br>
-                        <span id="progressFileName">文件名：</span><br>
-                        <span id="progressNumbers">已上传 0.0 KB / 0.0 KB</span>
-                    </div>
-                    <div class="p-bar-bg"><div class="p-bar-fill" id="uploadProgressFill"></div></div>
-                </div>
-            </div>
-            <div id="view-reader">
-                <div class="reader-top-50">
-                    <div class="reader-title-half" id="readerTitleDisplay">未加载文档...</div>
-                    <button class="btn-return-half" id="backToMainBtn">返回</button>
-                </div>
-                <div class="reader-search-bar" id="readerSearchBar" style="display:none;">
-                    <input type="text" id="readerSearchInput" placeholder="全文搜索...">
-                    <button id="btnSearchPrev">▲</button>
-                    <button id="btnSearchNext">▼</button>
-                    <span id="searchResultCount"></span>
-                    <button id="btnSearchClose" style="background:transparent;color:var(--text-primary);">✕</button>
-                </div>
-                <div class="reader-stats-bar" id="readerStatsBar">
-                    <span id="statTotalChars">字数: 0</span>
-                    <span id="statProgress">进度: 0%</span>
-                </div>
-                <div class="reader-box" id="readerBox">
-                    <div class="reader-content" id="readerContent">上传文件后，点击"确认"进入阅读...</div>
-                    <div class="reader-page" id="readerPageIndicator">第 0 / 0 页</div>
-                </div>
-                <div class="reader-bottom-bar">
-                    <div class="arrow-btn" id="readerPrevBtn">◀</div>
-                    <div class="arrow-btn" id="readerNextBtn">▶</div>
-                    <button class="btn-sm" id="btnTtsToggle" style="position:absolute;left:0;" title="朗读">🔊</button>
-                    <div class="bottom-unicode-wrap">
-                        <span>Unicode</span>
-                        <div class="toggle-track" id="unicodeToggle"><div class="toggle-thumb"></div></div>
-                    </div>
-                </div>
-            </div>
-            <div id="settings-interface">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; padding-bottom:0.5rem; border-bottom:1px solid rgba(255,255,255,0.3);">
-                    <span style="font-weight:600; font-size:1.2rem;">设置 Settings</span>
-                    <button class="btn-blue" id="closeSettingsBtn" style="padding:0.4rem 1.5rem; font-size:0.85rem;">关闭</button>
-                </div>
-                <div class="settings-layout">
-                    <div class="settings-sidebar">
-                        <div class="set-nav-item active" data-target="set-account">账号与安全</div>
-                        <div class="set-nav-item" data-target="set-security">ID属性</div>
-                        <div class="set-nav-item" data-target="set-display">显示</div>
-                        <div class="set-nav-item" data-target="set-reader">阅读器</div>
-                        <div class="set-nav-item" data-target="set-lang">语言与编码</div>
-                        <div class="set-nav-item" data-target="set-backup">备份</div>
-                        <div class="set-nav-item" data-target="set-import">导入导出</div>
-                        <div class="set-nav-item" data-target="set-about">关于</div>
-                        <div class="set-nav-item" data-target="set-help">帮助</div>
-                        <div class="set-nav-item" data-target="set-reset">重置</div>
-                    </div>
-                    <div class="settings-content">
-                        <div id="set-account" class="set-panel active">
-                            <div class="set-group"><div class="set-label">当前账号</div><div id="displayLoggedUser" style="background:rgba(255,255,255,0.4); padding:12px; border-radius:16px; font-weight:500;">加载中...</div></div>
-                            <div class="set-group"><div class="set-label">修改昵称</div><div class="set-row"><input type="text" id="inputUsername" value="User" style="width:150px;"><button class="btn-blue btn-small" onclick="changeUsername()">保存</button></div></div>
-                            <div class="set-group"><div class="set-label">修改密码</div><div class="set-row" style="flex-direction:column; align-items:flex-start; gap:0.5rem;"><input type="password" id="inputOldPassword" placeholder="旧密码（首次修改可留空）" style="width:220px;"><input type="password" id="inputNewPassword" placeholder="新密码" style="width:180px;"><button class="btn-blue btn-small" onclick="changePassword()">修改密码</button></div></div>
-                            <div class="set-group"><div class="set-label">操作</div><button class="action-btn danger" id="btnLogoutSettings" style="padding: 0.4rem 1.5rem; font-size: 0.85rem;">退出登录</button></div>
-                        </div>
-                        <div id="set-security" class="set-panel">
-                            <div class="set-group"><div class="set-label">设备激活绑定码</div><div id="dispId1" style="font-size:0.85rem; color:#555; font-family: monospace; letter-spacing: 1px; word-break: break-all;"></div></div>
-                            <div class="set-group"><div class="set-label">CkesiRead ID</div><div id="dispId2" style="font-size:0.85rem; color:#555; word-break:break-all;"></div></div>
-                            <div class="set-group"><div class="set-label">注册时间戳</div><div id="dispId3" style="font-size:0.85rem; color:#555;"></div></div>
-                        </div>
-                        <div id="set-display" class="set-panel">
-                            <div class="set-group"><div class="set-label">深色模式</div><div class="set-checkbox-row"><input type="checkbox" id="darkModeCheckbox"><label>启用深色模式</label></div></div>
-                            <div class="set-group"><div class="set-label">阅读区底色</div><div class="set-row"><input type="color" id="bgColorPicker" value="#f5f0eb"></div></div>
-                            <div class="set-group"><div class="set-label">正文字体颜色</div><div class="set-row"><input type="color" id="textColorPicker" value="#2c2a28"></div></div>
-                            <div class="set-group"><div class="set-label">正文字体</div><div class="styled-select-wrapper"><select id="fontFamilySelect"><option value="inherit">系统默认</option><option value="'Songti SC', '宋体', serif">宋体</option><option value="'PingFang SC', 'Microsoft YaHei', '黑体', sans-serif">黑体</option><option value="'Courier New', 'SF Mono', monospace">等宽</option></select></div></div>
-                            <div class="set-group"><div class="set-label">正文字体大小</div><div class="set-row"><input type="number" id="fontSizeInput" value="18" min="12" max="40"><span>px</span></div></div>
-                            <div class="set-group"><div class="set-label">实时预览</div><div class="preview-box" id="stylePreview"><span style="font-weight:500;">预览文本示例</span></div></div>
-                        </div>
-                        <div id="set-reader" class="set-panel">
-                            <div class="set-group"><div class="set-label">每页行数</div><div class="set-row"><input type="number" id="linesPerPageInput" value="10" min="5" max="30"></div></div>
-                            <div class="set-group"><div class="set-label">自动换行</div><div class="set-checkbox-row"><input type="checkbox" id="autoWrapCheckbox" checked><label>启用自动换行</label></div></div>
-                            <div class="set-group"><div class="set-label">阅读区行距</div><div class="set-row"><input type="number" id="lineHeightInput" value="2.0" min="1.2" max="3.0" step="0.1"><span>倍</span></div></div>
-                            <div class="set-group"><div class="set-label">背景纹理</div><div class="styled-select-wrapper"><select id="bgTextureSelect"><option value="none">无</option><option value="paper">纸张纹理</option><option value="grid">网格</option></select></div></div>
-                        </div>
-                        <div id="set-lang" class="set-panel">
-                            <div class="set-group"><div class="set-label">文本解码格式</div><div class="styled-select-wrapper"><select id="encodingSelect"><option value="utf-8">UTF-8</option><option value="gbk">GBK (简体中文)</option><option value="big5">Big5 (繁体中文)</option><option value="shift-jis">Shift-JIS (日文)</option><option value="euc-kr">EUC-KR (韩文)</option></select></div></div>
-                            <div class="set-group"><div class="set-label">使用指定编码重新解码当前文档</div><button class="btn-blue btn-small" id="reloadEncodingBtn">重新加载</button></div>
-                        </div>
-                        <div id="set-backup" class="set-panel">
-                            <div class="set-group"><div class="set-label">自动备份间隔</div><div class="styled-select-wrapper"><select id="backupIntervalSelect"><option value="off">关闭</option><option value="3600">每 1 小时</option><option value="21600">每 6 小时</option><option value="86400">每天</option><option value="604800">每周</option></select></div></div>
-                            <div class="set-group"><div class="set-label">将当前文件池导出为备份</div><button class="btn-blue btn-small" id="backupPoolBtn">立即备份文件池</button></div>
-                        </div>
-                        <div id="set-import" class="set-panel">
-                            <div class="set-group"><button class="action-btn" onclick="exportConfig()" style="padding: 0.4rem 1.5rem; font-size: 0.85rem;">导出 .cks 配置文件</button></div>
-                            <div class="set-group"><button class="action-btn outline" onclick="document.getElementById('fileInputCks').click()" style="padding: 0.4rem 1.5rem; font-size: 0.85rem; background:transparent; border:1px solid #0b57d0; color:#0b57d0;">导入 .cks 配置文件</button></div>
-                        </div>
-                        <div id="set-about" class="set-panel">
-                            <div class="set-group" style="line-height:2; color:#444; font-size:0.9rem;"><b>CkesiRead</b> V2.0.1<br>轻量级纯文本阅读器，支持 TXT/DOCX/LOG/MD/JSON/XML/HTML 等格式。<br>基于 Web 技术构建，所有数据存储于浏览器本地。<br>©2026 CkeisTeam. 保留所有权利。</div>
-                        </div>
-                        <div id="set-help" class="set-panel">
-                            <div class="set-group" style="line-height:1.8; color:#444; font-size:0.9rem;"><b>文件管理</b><br>· 点击"上传"添加文件至文件池（最多20个）。<br>· 单击文件项可选中，双击直接进入阅读。<br>· 选中文件后可使用"确认"进入阅读或"删除此文件"移除。<br>· 点击 ⭐ 可收藏/取消收藏当前选中文件。<br><br><b>阅读操作</b><br>· 按 A / D 键或左右方向键翻页。<br>· Ctrl+F 或点击搜索图标可全文搜索。<br>· 每页行数、自动换行、行距、字体均可在"阅读器"设置中调整。<br>· 支持 Unicode 转义模式，方便查看特殊字符编码。<br>· 点击 🔊 可语音朗读当前页。<br><br><b>配置与备份</b><br>· 通过"导入导出"面板可导出 .cks 配置文件用于迁移。<br>· 自动备份功能可定时将文件池保存至本地存储。<br>· 深色模式可在"显示"设置中切换。</div>
-                        </div>
-                        <div id="set-reset" class="set-panel">
-                            <div class="set-group"><div class="set-label">重置所有外观设置</div><button class="action-btn danger" id="btnResetSettings" style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">恢复默认</button></div>
-                            <div class="set-group"><div class="set-label">清空文件池</div><button class="action-btn danger" id="btnClearPool" style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">清空所有文件</button></div>
-                            <div class="set-group"><div class="set-label">注销账号</div><button class="action-btn danger" id="btnDeleteAccount" style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">彻底删除账号及所有数据</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer">©2026 Ckesiead V2.0.1</div>
-        </div>
-    </div>
-    <script>  
-        // ==================== 开机动画逻辑 ====================  
-        (function bootSequence() {
-            const bootEl = document.getElementById('boot-animation');
-            const minDuration = 2500;
-            const startTime = Date.now();
-            function finishBoot() {
-                const elapsed = Date.now() - startTime;
-                const remaining = Math.max(0, minDuration - elapsed);
-                setTimeout(() => {
-                    bootEl.classList.add('fade-out');
-                    setTimeout(() => { if (bootEl.parentNode) bootEl.parentNode.removeChild(bootEl); }, 800);
-                }, remaining);
-            }
-            window.addEventListener('load', finishBoot);
-            setTimeout(() => { if (!bootEl.classList.contains('fade-out')) finishBoot(); }, minDuration + 500);
-        })();
-
-        // ============ 自定义确认弹窗 ============
-        const confirmOverlay = document.getElementById('customConfirmOverlay');
-        const confirmMsg = document.getElementById('customConfirmMsg');
-        const confirmOk = document.getElementById('customConfirmOk');
-        const confirmCancel = document.getElementById('customConfirmCancel');
-        let confirmCallback = null;
-        function showConfirm(msg, callback, isDanger = false) {
-            confirmMsg.textContent = msg;
-            confirmCallback = callback;
-            confirmOk.classList.toggle('danger-confirm', isDanger);
-            confirmOverlay.classList.add('active');
-        }
-        function hideConfirm() {
-            confirmOverlay.classList.remove('active');
-            confirmCallback = null;
-        }
-        confirmOk.addEventListener('click', function() {
-            const cb = confirmCallback;
-            hideConfirm();
-            if (typeof cb === 'function') cb(true);
-        });
-        confirmCancel.addEventListener('click', function() {
-            const cb = confirmCallback;
-            hideConfirm();
-            if (typeof cb === 'function') cb(false);
-        });
-        confirmOverlay.addEventListener('click', function(e) { if (e.target === confirmOverlay) hideConfirm(); });
-
-        // ============ Toast ============
-        function showToast(msg, type = 'success') {
-            const t = document.getElementById('customToast');
-            t.textContent = msg;
-            t.className = 'show';
-            if (type === 'error') t.classList.add('error');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(() => { t.className = ''; }, 3000);
-        }
-
-        // ============ ID 生成器 ============
-        function generateId1() {
-            let s = '';
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            for (let i = 0; i < 25; i++) {
-                if (i === 5 || i === 10 || i === 15 || i === 20) s += '-';
-                else s += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return s;
-        }
-        function generateId2() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-            let s = '';
-            for (let i = 0; i < 18; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-            return s;
-        }
-        function generateRandomUsername() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let s = '';
-            for (let i = 0; i < 18; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-            return s + '_' + Date.now().toString(36);
-        }
-
-        // ============ 常量 ============
-        const USER_KEY = 'ckesiread_user_data';
-        const POOL_KEY = 'ckesiread_file_pool';
-        const APP_KEY = 'ckesiread_appearance';
-        const READER_KEY = 'ckesiread_reader_settings';
-        const BOOKMARK_KEY = 'ckesiread_bookmarks';
-        const PROGRESS_KEY = 'ckesiread_reading_progress';
-        const MAX_POOL_SIZE = 20;
-        const DEFAULT_PASSWORD = 'ckesi123';
-
-        // ============ 管理员检测 ============
-        function _a(d) { return atob(d); }
-        function isAdminUser(userObj) {
-            if (!userObj) return false;
-            const k1 = _a('R0I5TlYtQlBORy1LVVA4LVhVRUctUTJTRw==');
-            const k2 = _a('MmVDamRTNWIma2dLV2lHI2dh');
-            const k3 = _a('MjAyNi84LzEwIDIxOjA5OjI5');
-            return userObj.id1 === k1 && userObj.id2 === k2 && userObj.id3 === k3;
-        }
-        function getCurrentUser() {
-            const raw = localStorage.getItem(USER_KEY);
-            if (!raw) return null;
-            try { return normalizeUserData(JSON.parse(raw)); } catch (e) { return null; }
-        }
-        function isCurrentUserAdmin() { return isAdminUser(getCurrentUser()); }
-
-        // ============ 用户数据兼容与验证 ============
-        function normalizeUserData(userObj) {
-            if (!userObj.password) userObj.password = DEFAULT_PASSWORD;
-            if (!userObj.username || userObj.username.trim() === '') userObj.username = generateRandomUsername();
-            if (!userObj.id1) userObj.id1 = generateId1();
-            if (!userObj.id2) userObj.id2 = generateId2();
-            if (!userObj.id3) userObj.id3 = new Date().toLocaleString('zh-CN', { hour12: false });
-            return userObj;
-        }
-        function verifyPassword(userObj, inputPassword) {
-            if (!userObj || !userObj.password) return false;
-            return userObj.password === inputPassword;
-        }
-        function isDefaultPassword(userObj) { return userObj && userObj.password === DEFAULT_PASSWORD; }
-        function saveUser(userObj) {
-            const normalized = normalizeUserData(userObj);
-            localStorage.setItem(USER_KEY, JSON.stringify(normalized));
-            return normalized;
-        }
-
-        // ============ 书签管理 ============
-        function getBookmarks() {
-            try { return JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || []; } catch (e) { return []; }
-        }
-        function saveBookmarks(arr) { localStorage.setItem(BOOKMARK_KEY, JSON.stringify(arr)); }
-        function isBookmarked(fileName) { return getBookmarks().includes(fileName); }
-        function toggleBookmark(fileName) {
-            let bm = getBookmarks();
-            const idx = bm.indexOf(fileName);
-            if (idx > -1) { bm.splice(idx, 1); } else { bm.push(fileName); }
-            saveBookmarks(bm);
-            return !(idx > -1);
-        }
-
-        // ============ 阅读进度管理 ============
-        function getProgress(fileName) {
-            try {
-                const all = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {};
-                return all[fileName] || 0;
-            } catch (e) { return 0; }
-        }
-        function saveProgress(fileName, page) {
-            try {
-                const all = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {};
-                all[fileName] = page;
-                localStorage.setItem(PROGRESS_KEY, JSON.stringify(all));
-            } catch (e) {}
-        }
-
-        // ============ DOM 引用 ============
-        const loginInterface = document.getElementById('login-interface');
-        const loginSubtitle = document.getElementById('loginSubtitle');
-        const loginButtons = document.getElementById('login-buttons');
-        const loginFormArea = document.getElementById('login-form-area');
-        const registerFormArea = document.getElementById('register-form-area');
-        const loginUsername = document.getElementById('loginUsername');
-        const loginPassword = document.getElementById('loginPassword');
-        const btnLoginSubmit = document.getElementById('btnLoginSubmit');
-        const btnLoginCancel = document.getElementById('btnLoginCancel');
-        const regUsername = document.getElementById('regUsername');
-        const regPassword = document.getElementById('regPassword');
-        const btnRandomName = document.getElementById('btnRandomName');
-        const btnRegisterConfirm = document.getElementById('btnRegisterConfirm');
-        const btnRegisterBack = document.getElementById('btnRegisterBack');
-        const appContainer = document.getElementById('app-container');
-        const viewHome = document.getElementById('view-home');
-        const viewReader = document.getElementById('view-reader');
-        const settingsInterface = document.getElementById('settings-interface');
-        const openSettingsBtn = document.getElementById('openSettingsBtn');
-        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const btnRegister = document.getElementById('btnRegister');
-        const btnImportCks = document.getElementById('btnImportCks');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const confirmBtn = document.getElementById('confirmBtn');
-        const deleteBtn = document.getElementById('deleteBtn');
-        const btnBookmarkToggle = document.getElementById('btnBookmarkToggle');
-        const fileInputDoc = document.getElementById('fileInputDoc');
-        const mainStatusDisplay = document.getElementById('mainStatusDisplay');
-        const filePoolArea = document.getElementById('filePoolArea');
-        const poolEmptyText = document.getElementById('poolEmptyText');
-        const poolCountDisplay = document.getElementById('poolCountDisplay');
-        const uploadProgressBox = document.getElementById('uploadProgressBox');
-        const progressTextStatus = document.getElementById('progressTextStatus');
-        const progressFileName = document.getElementById('progressFileName');
-        const progressNumbers = document.getElementById('progressNumbers');
-        const uploadProgressFill = document.getElementById('uploadProgressFill');
-        const backToMainBtn = document.getElementById('backToMainBtn');
-        const readerBox = document.getElementById('readerBox');
-        const readerContent = document.getElementById('readerContent');
-        const readerTitleDisplay = document.getElementById('readerTitleDisplay');
-        const readerPageIndicator = document.getElementById('readerPageIndicator');
-        const readerPrevBtn = document.getElementById('readerPrevBtn');
-        const readerNextBtn = document.getElementById('readerNextBtn');
-        const unicodeToggle = document.getElementById('unicodeToggle');
-        const btnTtsToggle = document.getElementById('btnTtsToggle');
-        const readerSearchBar = document.getElementById('readerSearchBar');
-        const readerSearchInput = document.getElementById('readerSearchInput');
-        const btnSearchPrev = document.getElementById('btnSearchPrev');
-        const btnSearchNext = document.getElementById('btnSearchNext');
-        const searchResultCount = document.getElementById('searchResultCount');
-        const btnSearchClose = document.getElementById('btnSearchClose');
-        const statTotalChars = document.getElementById('statTotalChars');
-        const statProgress = document.getElementById('statProgress');
-        const displayLoggedUser = document.getElementById('displayLoggedUser');
-        const btnLogoutSettings = document.getElementById('btnLogoutSettings');
-        const bgColorPicker = document.getElementById('bgColorPicker');
-        const textColorPicker = document.getElementById('textColorPicker');
-        const fontSizeInput = document.getElementById('fontSizeInput');
-        const fontFamilySelect = document.getElementById('fontFamilySelect');
-        const darkModeCheckbox = document.getElementById('darkModeCheckbox');
-        const encodingSelect = document.getElementById('encodingSelect');
-        const stylePreview = document.getElementById('stylePreview');
-        const inputUsername = document.getElementById('inputUsername');
-        const inputOldPassword = document.getElementById('inputOldPassword');
-        const inputNewPassword = document.getElementById('inputNewPassword');
-        const dispId1 = document.getElementById('dispId1');
-        const dispId2 = document.getElementById('dispId2');
-        const dispId3 = document.getElementById('dispId3');
-        const btnResetSettings = document.getElementById('btnResetSettings');
-        const btnClearPool = document.getElementById('btnClearPool');
-        const btnDeleteAccount = document.getElementById('btnDeleteAccount');
-        const poolSearchInput = document.getElementById('poolSearchInput');
-        const linesPerPageInput = document.getElementById('linesPerPageInput');
-        const autoWrapCheckbox = document.getElementById('autoWrapCheckbox');
-        const lineHeightInput = document.getElementById('lineHeightInput');
-        const bgTextureSelect = document.getElementById('bgTextureSelect');
-        const backupIntervalSelect = document.getElementById('backupIntervalSelect');
-        const backupPoolBtn = document.getElementById('backupPoolBtn');
-        const reloadEncodingBtn = document.getElementById('reloadEncodingBtn');
-        const fileInputCks = document.getElementById('fileInputCks');
-
-        // ============ 状态 ============
-        let filePool = [];
-        let selectedPoolIndex = -1;
-        let currentFileIndex = -1;
-        let pages = [];
-        let currentPage = 0;
-        let isInReader = false;
-        let isUnicodeEnabled = false;
-        let isTtsActive = false;
-        let linesPerPage = 10;
-        let searchResults = [];
-        let searchResultIdx = 0;
-        let ttsUtterance = null;
-
-        // ============ 加载设置 ============
-        function loadReaderSettings() {
-            const data = JSON.parse(localStorage.getItem(READER_KEY));
-            if (data) {
-                linesPerPage = data.linesPerPage || 10;
-                linesPerPageInput.value = linesPerPage;
-                autoWrapCheckbox.checked = data.autoWrap !== undefined ? data.autoWrap : true;
-                readerContent.style.whiteSpace = data.autoWrap !== undefined && !data.autoWrap ? 'nowrap' : 'pre-wrap';
-                readerContent.style.lineHeight = data.lineHeight || '2.0';
-                lineHeightInput.value = data.lineHeight || '2.0';
-                if (data.bgTexture) { bgTextureSelect.value = data.bgTexture;
-                    applyBgTexture(data.bgTexture); }
-            } else {
-                linesPerPageInput.value = 10;
-                autoWrapCheckbox.checked = true;
-                lineHeightInput.value = '2.0';
-                bgTextureSelect.value = 'none';
-                readerContent.style.whiteSpace = 'pre-wrap';
-                readerContent.style.lineHeight = '2.0';
-                applyBgTexture('none');
-            }
-        }
-        function saveReaderSettings() {
-            const data = { linesPerPage: parseInt(linesPerPageInput.value) || 10, autoWrap: autoWrapCheckbox.checked,
-                lineHeight: parseFloat(lineHeightInput.value) || 2.0, bgTexture: bgTextureSelect.value };
-            localStorage.setItem(READER_KEY, JSON.stringify(data));
-            linesPerPage = data.linesPerPage;
-            readerContent.style.whiteSpace = data.autoWrap ? 'pre-wrap' : 'nowrap';
-            readerContent.style.lineHeight = data.lineHeight + '';
-            applyBgTexture(data.bgTexture);
-        }
-        function applyBgTexture(texture) {
-            if (texture === 'paper') {
-                readerBox.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.08\'/%3E%3C/svg%3E")';
-                readerBox.style.backgroundSize = '200px 200px';
-                readerBox.style.backgroundBlendMode = 'overlay';
-            } else if (texture === 'grid') {
-                readerBox.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)';
-                readerBox.style.backgroundSize = '20px 20px';
-                readerBox.style.backgroundBlendMode = 'normal';
-            } else {
-                readerBox.style.backgroundImage = 'none';
-                readerBox.style.backgroundSize = 'auto';
-                readerBox.style.backgroundBlendMode = 'normal';
-            }
-        }
-
-        // ============ 深色模式 ============
-        function applyDarkMode(enable) {
-            document.documentElement.classList.toggle('dark-mode', enable);
-            darkModeCheckbox.checked = enable;
-            localStorage.setItem('ckesiread_dark_mode', enable ? '1' : '0');
-        }
-        function loadDarkMode() {
-            const saved = localStorage.getItem('ckesiread_dark_mode');
-            applyDarkMode(saved === '1');
-        }
-        darkModeCheckbox.addEventListener('change', function() { applyDarkMode(this.checked); });
-
-        // ============ 主题 ============
-        function applyTheme() {
-            const data = { bgColor: bgColorPicker.value, textColor: textColorPicker.value, fontSize: parseInt(
-                    fontSizeInput.value), fontFamily: fontFamilySelect.value, encoding: encodingSelect.value };
-            localStorage.setItem(APP_KEY, JSON.stringify(data));
-            loadTheme();
-        }
-        function loadTheme() {
-            const data = JSON.parse(localStorage.getItem(APP_KEY));
-            if (data) {
-                readerBox.style.backgroundColor = data.bgColor || '#f5f0eb';
-                readerContent.style.color = data.textColor || '#2c2a28';
-                readerContent.style.fontSize = (data.fontSize || 18) + 'px';
-                readerContent.style.fontFamily = data.fontFamily || 'inherit';
-                bgColorPicker.value = data.bgColor || '#f5f0eb';
-                textColorPicker.value = data.textColor || '#2c2a28';
-                fontSizeInput.value = data.fontSize || 18;
-                fontFamilySelect.value = data.fontFamily || 'inherit';
-                encodingSelect.value = data.encoding || 'utf-8';
-            } else {
-                readerBox.style.backgroundColor = '#f5f0eb';
-                readerContent.style.color = '#2c2a28';
-                readerContent.style.fontSize = '18px';
-                readerContent.style.fontFamily = 'inherit';
-                bgColorPicker.value = '#f5f0eb';
-                textColorPicker.value = '#2c2a28';
-                fontSizeInput.value = 18;
-                fontFamilySelect.value = 'inherit';
-                encodingSelect.value = 'utf-8';
-            }
-            updatePreview();
-        }
-        function updatePreview() {
-            stylePreview.style.backgroundColor = bgColorPicker.value;
-            stylePreview.style.color = textColorPicker.value;
-            stylePreview.style.fontSize = fontSizeInput.value + 'px';
-            stylePreview.style.fontFamily = fontFamilySelect.value;
-        }
-        function updateConfirmButton() { confirmBtn.disabled = !(selectedPoolIndex >= 0 && selectedPoolIndex < filePool
-                .length); }
-
-        function updateBookmarkButton() {
-            if (selectedPoolIndex >= 0 && selectedPoolIndex < filePool.length) {
-                const name = filePool[selectedPoolIndex].name;
-                btnBookmarkToggle.textContent = isBookmarked(name) ? '\u2605' : '\u2606';
-                btnBookmarkToggle.style.opacity = '1';
-            } else {
-                btnBookmarkToggle.style.opacity = '0.4';
-            }
-        }
-
-        function enterApp() {
-            loginInterface.style.display = 'none';
-            appContainer.style.display = 'flex';
-            updateConfirmButton();
-            updateBookmarkButton();
-            loadTheme();
-            loadDarkMode();
-            loadReaderSettings();
-            loadPool();
-            updatePoolCount();
-            if (isCurrentUserAdmin()) showToast('管理员模式已激活');
-        }
-
-        function fullLogout(clearAll = false) {
-            if (clearAll) {
-                localStorage.removeItem(POOL_KEY);
-                localStorage.removeItem(APP_KEY);
-                localStorage.removeItem(READER_KEY);
-                localStorage.removeItem(BOOKMARK_KEY);
-                localStorage.removeItem(PROGRESS_KEY);
-                localStorage.removeItem('ckesiread_auto_backup');
-                localStorage.removeItem('ckesiread_dark_mode');
-                if (backupTimer) clearInterval(backupTimer);
-            }
-            localStorage.removeItem(USER_KEY);
-            filePool = [];
-            selectedPoolIndex = -1;
-            currentFileIndex = -1;
-            pages = [];
-            currentPage = 0;
-            isInReader = false;
-            stopTts();
-            settingsInterface.classList.remove('active');
-            appContainer.style.display = 'none';
-            viewReader.style.display = 'none';
-            viewHome.style.display = 'flex';
-            loginInterface.style.display = 'flex';
-            loginButtons.style.display = 'flex';
-            loginFormArea.classList.remove('active');
-            registerFormArea.classList.remove('active');
-            loginSubtitle.textContent = '注册新账号，或导入已有的配置文件';
-            deleteBtn.disabled = true;
-            deleteBtn.classList.add('disabled-btn');
-            deleteBtn.style.cursor = 'default';
-            updateConfirmButton();
-            updateBookmarkButton();
-        }
-
-        // ============ 事件绑定 ============
-        bgColorPicker.addEventListener('input', () => { updatePreview();
-            applyTheme(); });
-        textColorPicker.addEventListener('input', () => { updatePreview();
-            applyTheme(); });
-        fontSizeInput.addEventListener('input', () => { updatePreview();
-            applyTheme(); });
-        fontFamilySelect.addEventListener('change', () => { updatePreview();
-            applyTheme(); });
-        encodingSelect.addEventListener('change', applyTheme);
-        linesPerPageInput.addEventListener('change', saveReaderSettings);
-        autoWrapCheckbox.addEventListener('change', saveReaderSettings);
-        lineHeightInput.addEventListener('change', saveReaderSettings);
-        bgTextureSelect.addEventListener('change', saveReaderSettings);
-
-        reloadEncodingBtn.addEventListener('click', function() {
-            if (currentFileIndex === -1 || currentFileIndex >= filePool.length) { showToast('请先加载一个文件',
-                    'error'); return; }
-            const enc = encodingSelect.value;
-            const item = filePool[currentFileIndex];
-            try {
-                const decoder = new TextDecoder(enc);
-                const bytes = new TextEncoder().encode(item.text);
-                item.text = decoder.decode(bytes);
-                localStorage.setItem(POOL_KEY, JSON.stringify(filePool));
-                pages = [];
-                currentPage = 0;
-                if (isInReader) loadFileIntoPages(item.text);
-                showToast('已使用 ' + enc + ' 重新解码');
-            } catch (e) { showToast('编码转换失败', 'error'); }
-        });
-
-        backupPoolBtn.addEventListener('click', function() {
-            if (filePool.length === 0) { showToast('文件池为空', 'error'); return; }
-            const backup = { time: new Date().toISOString(), pool: filePool };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'CkesiRead_Pool_Backup_' + new Date().toISOString().slice(0, 10) + '.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('文件池备份已导出');
-        });
-
-        let backupTimer = null;
-        function startAutoBackup(interval) {
-            if (backupTimer) clearInterval(backupTimer);
-            if (interval === 'off') return;
-            backupTimer = setInterval(() => {
-                if (filePool.length > 0) localStorage.setItem('ckesiread_auto_backup', JSON.stringify({ time: new Date()
-                        .toISOString(), pool: filePool }));
-            }, parseInt(interval) * 1000);
-        }
-        backupIntervalSelect.addEventListener('change', function() { startAutoBackup(this.value);
-            showToast('自动备份间隔已更新'); });
-
-        // ============ 注册流程 ============
-        btnRegister.addEventListener('click', function() {
-            loginButtons.style.display = 'none';
-            loginFormArea.classList.remove('active');
-            registerFormArea.classList.add('active');
-            loginSubtitle.textContent = '设置你的用户名和密码';
-            regUsername.value = generateRandomUsername();
-            regPassword.value = DEFAULT_PASSWORD;
-            setTimeout(() => { registerFormArea.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        });
-        btnRandomName.addEventListener('click', function() { regUsername.value = generateRandomUsername(); });
-        btnRegisterConfirm.addEventListener('click', function() {
-            const name = regUsername.value.trim();
-            const pass = regPassword.value.trim();
-            if (!name) { showToast('用户名不能为空', 'error'); return; }
-            if (!pass || pass.length < 6) { showToast('密码至少6位', 'error'); return; }
-            saveUser({ username: name, password: pass, id1: generateId1(), id2: generateId2(), id3: new Date()
-                    .toLocaleString('zh-CN', { hour12: false }) });
-            showToast('注册成功！欢迎 ' + name);
-            setTimeout(() => enterApp(), 800);
-        });
-        btnRegisterBack.addEventListener('click', function() {
-            registerFormArea.classList.remove('active');
-            loginButtons.style.display = 'flex';
-            loginSubtitle.textContent = '注册新账号，或导入已有的配置文件';
-        });
-
-        // ============ 登录 ============
-        btnLoginSubmit.addEventListener('click', function() {
-            const username = loginUsername.value.trim();
-            const password = loginPassword.value.trim();
-            if (!username || !password) { showToast('请输入用户名和密码', 'error'); return; }
-            const userObj = getCurrentUser();
-            if (!userObj) { showToast('无账号数据，请先注册', 'error'); return; }
-            if (userObj.username !== username) { showToast('用户名不正确', 'error'); return; }
-            if (!verifyPassword(userObj, password)) { showToast('密码不正确', 'error'); return; }
-            showToast(isAdminUser(userObj) ? '管理员登录成功！' : '登录成功！');
-            loginFormArea.classList.remove('active');
-            setTimeout(() => enterApp(), 500);
-        });
-        btnLoginCancel.addEventListener('click', function() {
-            loginFormArea.classList.remove('active');
-            loginButtons.style.display = 'flex';
-            loginSubtitle.textContent = '注册新账号，或导入已有的配置文件';
-        });
-
-        // ============ 导入配置 ============
-        btnImportCks.addEventListener('click', () => fileInputCks.click());
-        fileInputCks.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                try {
-                    const raw = ev.target.result;
-                    const decoded = decodeURIComponent(escape(atob(raw)));
-                    const parsed = JSON.parse(decoded);
-                    if (parsed.user) {
-                        const importedUser = normalizeUserData(parsed.user);
-                        saveUser(importedUser);
-                        loginButtons.style.display = 'none';
-                        loginFormArea.classList.add('active');
-                        registerFormArea.classList.remove('active');
-                        loginUsername.value = importedUser.username;
-                        loginPassword.value = '';
-                        loginPassword.focus();
-                        loginSubtitle.textContent = '配置已导入，请输入密码登录';
-                        showToast('配置已导入，请输入密码');
-                    } else { showToast('配置损坏：缺少用户数据', 'error'); }
-                } catch (e) { showToast('导入失败：文件格式错误', 'error'); }
-            };
-            reader.readAsText(file);
-            e.target.value = '';
-        });
-
-        // ============ 设置面板 ============
-        openSettingsBtn.addEventListener('click', () => {
-            if (isInReader) return;
-            settingsInterface.classList.add('active');
-            const u = getCurrentUser();
-            displayLoggedUser.textContent = u ? (isAdminUser(u) ? u.username + ' [管理员]' : u.username) : '未登录';
-            inputUsername.value = u ? u.username : '';
-            inputOldPassword.value = '';
-            inputNewPassword.value = '';
-            darkModeCheckbox.checked = document.documentElement.classList.contains('dark-mode');
-            if (u) { dispId1.textContent = u.id1 || '未绑定';
-                dispId2.textContent = u.id2 || '未绑定';
-                dispId3.textContent = u.id3 || '未绑定'; } else { dispId1.textContent = '未绑定';
-                dispId2.textContent = '未绑定';
-                dispId3.textContent = '未绑定'; }
-        });
-        closeSettingsBtn.addEventListener('click', () => { settingsInterface.classList.remove('active');
-            showToast('设置已关闭'); });
-        document.querySelectorAll('.set-nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.set-nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.set-panel').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(this.dataset.target).classList.add('active');
-                document.querySelector('.settings-content').scrollTop = 0;
-            });
-        });
-
-        function changeUsername() {
-            const u = getCurrentUser();
-            if (!u) { showToast('请先登录', 'error'); return; }
-            const newName = inputUsername.value.trim();
-            if (!newName) { showToast('昵称不能为空', 'error'); return; }
-            u.username = newName;
-            saveUser(u);
-            displayLoggedUser.textContent = isAdminUser(u) ? newName + ' [管理员]' : newName;
-            showToast('昵称已更新');
-        }
-
-        function changePassword() {
-            const u = getCurrentUser();
-            if (!u) { showToast('请先登录', 'error'); return; }
-            const oldPass = inputOldPassword.value.trim();
-            const newPass = inputNewPassword.value.trim();
-            if (!newPass) { showToast('请填写新密码', 'error'); return; }
-            if (newPass.length < 6) { showToast('新密码至少6位', 'error'); return; }
-            const isDefault = isDefaultPassword(u);
-            if (!isDefault) {
-                if (!oldPass) { showToast('请填写旧密码', 'error'); return; }
-                if (!verifyPassword(u, oldPass)) { showToast('旧密码不正确', 'error'); return; }
-            }
-            u.password = newPass;
-            saveUser(u);
-            inputOldPassword.value = '';
-            inputNewPassword.value = '';
-            showToast('密码已修改');
-        }
-
-        btnLogoutSettings.addEventListener('click', function() {
-            showConfirm('确认退出登录？文件池数据将保留。', function(ok) {
-                if (!ok) return;
-                fullLogout(false);
-                showToast('已退出登录');
-            });
-        });
-
-        btnResetSettings.addEventListener('click', function() {
-            if (isCurrentUserAdmin()) { showToast('管理员模式下重置功能已禁用', 'error'); return; }
-            showConfirm('确认恢复默认的外观设置吗？', function(ok) {
-                if (!ok) return;
-                localStorage.removeItem(APP_KEY);
-                localStorage.removeItem(READER_KEY);
-                localStorage.removeItem('ckesiread_dark_mode');
-                applyDarkMode(false);
-                loadTheme();
-                loadReaderSettings();
-                showToast('外观已重置为默认');
-            });
-        });
-
-        btnClearPool.addEventListener('click', function() {
-            if (isCurrentUserAdmin()) { showToast('管理员模式下清空文件池功能已禁用', 'error'); return; }
-            showConfirm('确认清空所有文件吗？此操作不可恢复。', function(ok) {
-                if (!ok) return;
-                filePool = [];
-                selectedPoolIndex = -1;
-                localStorage.setItem(POOL_KEY, JSON.stringify(filePool));
-                renderPool();
-                updatePoolCount();
-                updateConfirmButton();
-                updateBookmarkButton();
-                deleteBtn.disabled = true;
-                deleteBtn.classList.add('disabled-btn');
-                showToast('文件池已清空');
-            }, true);
-        });
-
-        btnDeleteAccount.addEventListener('click', function() {
-            if (isCurrentUserAdmin()) { showToast('管理员账号不可注销', 'error'); return; }
-            showConfirm('此操作将永久删除账号、文件池及所有设置，不可恢复。\n\n确定继续吗？', function(ok) {
-                if (!ok) return;
-                fullLogout(true);
-                showToast('账号已注销，所有数据已清除');
-            }, true);
-        });
-
-        // ============ 书签切换 ============
-        btnBookmarkToggle.addEventListener('click', function() {
-            if (selectedPoolIndex < 0 || selectedPoolIndex >= filePool.length) {
-                showToast('请先在文件池中选中一个文件', 'error');
-                return;
-            }
-            const name = filePool[selectedPoolIndex].name;
-            const added = toggleBookmark(name);
-            updateBookmarkButton();
-            renderPool();
-            showToast(added ? '已收藏: ' + name : '已取消收藏: ' + name);
-        });
-
-        // ============ 文件池 ============
-        function loadPool() {
-            const cached = localStorage.getItem(POOL_KEY);
-            if (cached) { try { filePool = JSON.parse(cached); } catch (e) { filePool = []; } }
-            renderPool();
-            updatePoolCount();
-        }
-        function updatePoolCount() {
-            poolCountDisplay.textContent = '(' + filePool.length + '/' + MAX_POOL_SIZE + ')';
-            poolCountDisplay.classList.toggle('pool-full', filePool.length >= MAX_POOL_SIZE);
-        }
-        function renderPool() {
-            const searchVal = poolSearchInput.value.toLowerCase();
-            const filtered = filePool.filter(item => item.name.toLowerCase().includes(searchVal));
-            filePoolArea.innerHTML = '';
-            if (filePool.length === 0) {
-                filePoolArea.appendChild(poolEmptyText);
-                filePoolArea.appendChild(poolCountDisplay);
-                updateConfirmButton();
-                updateBookmarkButton();
-                return;
-            }
-            if (filtered.length === 0) {
-                const emptyMsg = document.createElement('span');
-                emptyMsg.textContent = '未找到匹配的文件';
-                emptyMsg.style.color = '#999';
-                filePoolArea.appendChild(emptyMsg);
-                filePoolArea.appendChild(poolCountDisplay);
-                return;
-            }
-            filtered.forEach((item) => {
-                const realIndex = filePool.findIndex(f => f.name === item.name && f.text === item.text);
-                const el = document.createElement('div');
-                el.className = 'file-pool-item';
-                if (realIndex === selectedPoolIndex) el.classList.add('selected');
-                if (isBookmarked(item.name)) el.classList.add('bookmarked');
-                el.textContent = item.name;
-                el.title = item.name + ' (单击选中，双击打开)';
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    selectedPoolIndex = realIndex;
-                    renderPool();
-                    updateBookmarkButton();
-                    deleteBtn.disabled = false;
-                    deleteBtn.classList.remove('disabled-btn');
-                    deleteBtn.style.cursor = 'pointer';
-                    updateConfirmButton();
-                });
-                el.addEventListener('dblclick', (e) => { e.stopPropagation();
-                    loadFileFromPool(realIndex); });
-                filePoolArea.appendChild(el);
-            });
-            filePoolArea.appendChild(poolCountDisplay);
-        }
-        poolSearchInput.addEventListener('input', renderPool);
-
-        function loadFileIntoPages(text) {
-            const lines = text.replace(/\r/g, '').split('\n');
-            let pageArray = [],
-                pageBuffer = [];
-            for (let i = 0; i < lines.length; i++) {
-                pageBuffer.push(lines[i]);
-                if (pageBuffer.length >= linesPerPage || i === lines.length - 1) { pageArray.push(pageBuffer.join(
-                        '\n'));
-                    pageBuffer = []; }
-            }
-            if (pageArray.length > 0 && pageArray[pageArray.length - 1].trim() === '') pageArray.pop();
-            pages = pageArray.length > 0 ? pageArray : [text];
-            currentPage = 0;
-        }
-
-        function loadFileFromPool(index) {
-            if (index < 0 || index >= filePool.length) return;
-            stopTts();
-            const item = filePool[index];
-            currentFileIndex = index;
-            mainStatusDisplay.textContent = item.name;
-            loadFileIntoPages(item.text);
-            const savedPage = getProgress(item.name);
-            if (savedPage > 0 && savedPage < pages.length) currentPage = savedPage;
-            viewHome.style.display = 'none';
-            viewReader.style.display = 'flex';
-            isInReader = true;
-            readerTitleDisplay.textContent = item.name;
-            updateReaderUI();
-            updateStats();
-            searchResults = [];
-            searchResultIdx = 0;
-            readerSearchBar.style.display = 'none';
-            readerSearchInput.value = '';
-        }
-
-        function updateReaderUI() {
-            if (!pages.length || !isInReader) return;
-            let displayText = pages[currentPage];
-            if (searchResults.length > 0 && searchResults[searchResultIdx]) {
-                const sr = searchResults[searchResultIdx];
-                const before = displayText.substring(0, sr.start);
-                const match = displayText.substring(sr.start, sr.end);
-                const after = displayText.substring(sr.end);
-                displayText = before + '<mark class="search-highlight current">' + match + '</mark>' + after;
-                for (let i = 0; i < searchResults.length; i++) {
-                    if (i === searchResultIdx) continue;
-                    const r = searchResults[i];
-                    const b2 = displayText.substring(0, r.start);
-                    const m2 = displayText.substring(r.start, r.end);
-                    const a2 = displayText.substring(r.end);
-                    displayText = b2 + '<mark class="search-highlight">' + m2 + '</mark>' + a2;
+    <div class="app-intro">${app.intro}</div>
+    ${buttonHtml}
+    ${isWinVer ? `<div class="red-dot ${alreadyVisited ? 'hidden' : ''}"></div>` : ''}
+`;
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('.app-btn')) return;
+                openModal(app);
+                if (isWinVer && !visitedApps.has(app.name)) {
+                    visitedApps.add(app.name);
+                    const dot = card.querySelector('.red-dot');
+                    if (dot) dot.classList.add('hidden');
                 }
-                readerContent.innerHTML = displayText;
+            });
+
+            return card;
+        }
+
+        // ==================== 渲染所有APP ====================
+        function renderApps() {
+            const homeGrid = document.getElementById("homeAppGrid");
+            const appsGrid = document.getElementById("appsAppGrid");
+            homeGrid.innerHTML = "";
+            appsGrid.innerHTML = "";
+
+            apps.forEach(function(app) {
+                const card = createAppCard(app);
+                const cardClone = card.cloneNode(true);
+                homeGrid.appendChild(card);
+                appsGrid.appendChild(cardClone);
+            });
+        }
+
+        // ==================== 打开详情弹窗 ====================
+        function openModal(app) {
+            if (app.icon) {
+    document.getElementById("modalIcon").innerHTML = `<img src="${app.icon}" alt="${app.name}">`;
+    document.getElementById("modalIcon").style.display = "block";
+} else {
+    document.getElementById("modalIcon").innerHTML = "";
+    document.getElementById("modalIcon").style.display = "none";
+}
+            document.getElementById("modalName").textContent = app.name;
+            document.getElementById("modalDesc").textContent = app.desc;
+            document.getElementById("modalIntro").textContent = app.intro;
+            document.getElementById("modalRating").innerHTML = 
+                '<span class="stars">' + getStars(app.rating) + '</span> ' + app.rating;
+
+            const downloadBtn = document.getElementById("modalDownload");
+
+            // 详情弹窗里的按钮逻辑
+            if (app.actionType === "web") {
+                downloadBtn.textContent = '获取';
+                downloadBtn.className = 'app-btn web';
+                downloadBtn.href = app.link;
+                downloadBtn.setAttribute('target', '_blank');
+            } else if (app.isMaintenance) {
+                downloadBtn.textContent = '正在维护';
+                downloadBtn.className = 'app-btn maintenance';
+                downloadBtn.href = '#';
+                downloadBtn.removeAttribute('target');
             } else {
-                readerContent.textContent = displayText;
+                downloadBtn.textContent = '免费下载';
+                downloadBtn.className = 'app-btn download';
+                downloadBtn.href = app.link;
+                downloadBtn.setAttribute('target', '_blank');
             }
-            readerPageIndicator.textContent = '第 ' + (currentPage + 1) + ' / ' + pages.length + ' 页';
-            readerPrevBtn.classList.toggle('disabled', currentPage === 0);
-            readerNextBtn.classList.toggle('disabled', currentPage === pages.length - 1);
-            if (currentFileIndex >= 0 && currentFileIndex < filePool.length) {
-                saveProgress(filePool[currentFileIndex].name, currentPage);
-            }
-            updateStats();
-        }
 
-        function updateStats() {
-            if (!pages.length || !isInReader) {
-                statTotalChars.textContent = '字数: 0';
-                statProgress.textContent = '进度: 0%';
-                return;
-            }
-            const totalChars = pages.reduce((sum, p) => sum + p.length, 0);
-            const readChars = pages.slice(0, currentPage).reduce((sum, p) => sum + p.length, 0);
-            const pct = totalChars > 0 ? Math.round((readChars / totalChars) * 100) : 0;
-            statTotalChars.textContent = '字数: ' + totalChars.toLocaleString();
-            statProgress.textContent = '进度: ' + pct + '%';
-        }
+            // 详细信息按钮 (仅 Win-Ver)
+            const actionsDiv = document.getElementById("modalActions");
+            const existingDetailBtn = actionsDiv.querySelector('.detail-btn');
+            if (existingDetailBtn) existingDetailBtn.remove();
 
-        function turnPage(d) {
-            if (currentPage + d >= 0 && currentPage + d < pages.length) { currentPage += d;
-                updateReaderUI(); }
-        }
-
-        readerPrevBtn.addEventListener('click', () => turnPage(-1));
-        readerNextBtn.addEventListener('click', () => turnPage(1));
-        document.addEventListener('keydown', (e) => {
-            if (isInReader && document.activeElement !== readerSearchInput) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            if (app.name === "CkesiWin-Ver") {
+                const detailBtn = document.createElement('a');
+                detailBtn.className = 'app-btn detail-btn';
+                detailBtn.textContent = '详细信息';
+                detailBtn.href = '#';
+                detailBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    readerSearchBar.style.display = 'flex';
-                    readerSearchInput.focus();
-                    return;
-                }
-                if (e.key === 'Escape') {
-                    readerSearchBar.style.display = 'none';
-                    searchResults = [];
-                    searchResultIdx = 0;
-                    updateReaderUI();
-                    return;
-                }
-                if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { e.preventDefault();
-                    turnPage(-1); } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { e
-                        .preventDefault();
-                    turnPage(1); }
+                    e.stopPropagation();
+                    openDetailModal();
+                });
+                actionsDiv.appendChild(detailBtn);
             }
-        });
 
-        // ============ 全文搜索 ============
-        function doSearch() {
-            const query = readerSearchInput.value.trim();
-            if (!query || !pages.length) { searchResults = [];
-                searchResultIdx = 0;
-                searchResultCount.textContent = '';
-                updateReaderUI(); return; }
-            searchResults = [];
-            const currentText = pages[currentPage];
-            let idx = 0;
-            while (idx < currentText.length) {
-                const pos = currentText.toLowerCase().indexOf(query.toLowerCase(), idx);
-                if (pos === -1) break;
-                searchResults.push({ start: pos, end: pos + query.length });
-                idx = pos + 1;
-            }
-            searchResultIdx = 0;
-            searchResultCount.textContent = searchResults.length > 0 ? (searchResultIdx + 1) + '/' + searchResults
-                .length : '无结果';
-            updateReaderUI();
-        }
-        readerSearchInput.addEventListener('input', doSearch);
-        btnSearchPrev.addEventListener('click', function() {
-            if (searchResults.length === 0) return;
-            searchResultIdx = (searchResultIdx - 1 + searchResults.length) % searchResults.length;
-            searchResultCount.textContent = (searchResultIdx + 1) + '/' + searchResults.length;
-            updateReaderUI();
-        });
-        btnSearchNext.addEventListener('click', function() {
-            if (searchResults.length === 0) return;
-            searchResultIdx = (searchResultIdx + 1) % searchResults.length;
-            searchResultCount.textContent = (searchResultIdx + 1) + '/' + searchResults.length;
-            updateReaderUI();
-        });
-        btnSearchClose.addEventListener('click', function() {
-            readerSearchBar.style.display = 'none';
-            searchResults = [];
-            searchResultIdx = 0;
-            updateReaderUI();
-        });
-
-        // ============ TTS 朗读 ============
-        function stopTts() {
-            if (ttsUtterance) {
-                window.speechSynthesis.cancel();
-                ttsUtterance = null;
-            }
-            isTtsActive = false;
-            btnTtsToggle.textContent = '\uD83D\uDD0A';
-        }
-        btnTtsToggle.addEventListener('click', function() {
-            if (!pages.length || !isInReader) return;
-            if (isTtsActive) { stopTts(); return; }
-            if (!window.speechSynthesis) { showToast('浏览器不支持语音朗读', 'error'); return; }
-            const text = pages[currentPage].replace(/<[^>]*>/g, '');
-            ttsUtterance = new SpeechSynthesisUtterance(text);
-            ttsUtterance.lang = 'zh-CN';
-            ttsUtterance.rate = 1.0;
-            ttsUtterance.onend = function() { stopTts(); };
-            ttsUtterance.onerror = function() { stopTts(); };
-            isTtsActive = true;
-            btnTtsToggle.textContent = '\uD83D\uDD07';
-            window.speechSynthesis.speak(ttsUtterance);
-            showToast('正在朗读当前页');
-        });
-
-        confirmBtn.addEventListener('click', function() { if (selectedPoolIndex === -1) { showToast('请先在文件池中选中一个文件',
-                'error'); return; }
-            loadFileFromPool(selectedPoolIndex); });
-        backToMainBtn.addEventListener('click', function() {
-            stopTts();
-            viewReader.style.display = 'none';
-            viewHome.style.display = 'flex';
-            isInReader = false;
-            readerSearchBar.style.display = 'none';
-            searchResults = [];
-            searchResultIdx = 0;
-            if (currentFileIndex !== -1 && currentFileIndex < filePool.length)
-                mainStatusDisplay.textContent = filePool[currentFileIndex].name;
-            updateBookmarkButton();
-        });
-
-        unicodeToggle.addEventListener('click', function() {
-            isUnicodeEnabled = !isUnicodeEnabled;
-            this.classList.toggle('active', isUnicodeEnabled);
-            if (pages.length > 0 && isInReader) {
-                if (isUnicodeEnabled) {
-                    try {
-                        readerContent.textContent = pages[currentPage].split('').map(c => { const code = c.charCodeAt(
-                                0); return code > 127 ? '\\u' + code.toString(16).padStart(4, '0') :
-                            c; }).join('');
-                    } catch (e) { showToast('转换失败', 'error'); }
-                } else { updateReaderUI(); }
-            }
-            showToast('Unicode 转义模式' + (isUnicodeEnabled ? '已开启' : '已关闭'));
-        });
-
-        // ============ 上传 ============
-        uploadBtn.addEventListener('click', () => fileInputDoc.click());
-        fileInputDoc.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (filePool.length >= MAX_POOL_SIZE) { showToast('文件池已满 (' + MAX_POOL_SIZE + '个)', 'error'); return; }
-            uploadProgressBox.classList.add('active');
-            const name = file.name;
-            progressFileName.textContent = '文件名：' + name;
-            progressTextStatus.textContent = '正在读取文件...';
-            progressNumbers.textContent = '准备中...';
-            uploadProgressFill.style.width = '0%';
-            const reader = new FileReader();
-            reader.onprogress = (e) => { if (e.lengthComputable) { progressNumbers.textContent = '已读取 ' + (e.loaded /
-                        1024).toFixed(1) + ' KB / ' + (e.total / 1024).toFixed(1) + ' KB';
-                    uploadProgressFill.style.width = ((e.loaded / e.total) * 100) + '%'; } };
-            reader.onload = function(ev) {
-                progressTextStatus.textContent = '正在解析文件...';
-                const ext = name.split('.').pop().toLowerCase();
-                if (ext === 'docx') {
-                    mammoth.extractRawText({ arrayBuffer: ev.target.result }).then(result => finishUpload(name, result
-                        .value)).catch(() => { showToast('DOCX 解析失败', 'error');
-                        uploadProgressBox.classList.remove('active'); });
-                } else {
-                    let textContent = "";
-                    try { textContent = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(ev.target
-                            .result)); } catch (e) { try { textContent = new TextDecoder('gbk').decode(new Uint8Array(
-                                ev.target.result)); } catch (e2) { showToast('无法识别编码', 'error');
-                            uploadProgressBox.classList.remove('active'); return; } }
-                    finishUpload(name, textContent);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            e.target.value = '';
-
-            function finishUpload(name, textContent) {
-                filePool.push({ name: name, text: textContent, isHtml: false });
-                localStorage.setItem(POOL_KEY, JSON.stringify(filePool));
-                progressTextStatus.textContent = '上传完成';
-                uploadProgressFill.style.width = '100%';
-                setTimeout(() => { uploadProgressBox.classList.remove('active');
-                    uploadProgressFill.style.width = '0%'; }, 1500);
-                renderPool();
-                updatePoolCount();
-                updateBookmarkButton();
-                mainStatusDisplay.textContent = name;
-                showToast('"' + name + '" 已加入 (' + filePool.length + '/' + MAX_POOL_SIZE + ')');
-            }
-        });
-
-        // ============ 删除 ============
-        deleteBtn.addEventListener('click', function() {
-            if (selectedPoolIndex === -1 || selectedPoolIndex >= filePool.length) { showToast('请先在列表中单击选中一个文件',
-                'error'); return; }
-            const name = filePool[selectedPoolIndex].name;
-            filePool.splice(selectedPoolIndex, 1);
-            localStorage.setItem(POOL_KEY, JSON.stringify(filePool));
-            if (isInReader && currentFileIndex === selectedPoolIndex) {
-                stopTts();
-                viewReader.style.display = 'none';
-                viewHome.style.display = 'flex';
-                isInReader = false;
-                mainStatusDisplay.textContent = "等待上传文件...";
-                currentFileIndex = -1;
-                pages = [];
-                currentPage = 0; } else if (selectedPoolIndex < currentFileIndex) currentFileIndex--;
-            else if (selectedPoolIndex === currentFileIndex) currentFileIndex = -1;
-            selectedPoolIndex = -1;
-            deleteBtn.disabled = true;
-            deleteBtn.classList.add('disabled-btn');
-            deleteBtn.style.cursor = 'default';
-            updateConfirmButton();
-            updateBookmarkButton();
-            renderPool();
-            updatePoolCount();
-            showToast('已移除: ' + name);
-        });
-
-        // ============ 导出配置 ============
-        function exportConfig() {
-            const u = getCurrentUser();
-            if (!u) { showToast('请先登录', 'error'); return; }
-            const a = JSON.parse(localStorage.getItem(APP_KEY) || '{}');
-            const r = JSON.parse(localStorage.getItem(READER_KEY) || '{}');
-            const obj = { user: u, appearance: a, reader: r, version: '2.0.1' };
-            const blob = new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(obj))))], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const el = document.createElement('a');
-            el.href = url;
-            el.download = 'CkesiRead_Backup_' + new Date().toISOString().slice(0, 10) + '.cks';
-            el.click();
-            URL.revokeObjectURL(url);
-            showToast('配置文件已导出');
+            document.getElementById("appModal").classList.add("show");
         }
 
-        // ============ 初始化 ============
-        loadPool();
-        loadTheme();
-        loadDarkMode();
-        loadReaderSettings();
-        updatePoolCount();
-        updateConfirmButton();
-        updateBookmarkButton();
-
-        const savedUser = getCurrentUser();
-        if (savedUser) {
-            loginButtons.style.display = 'none';
-            loginFormArea.classList.add('active');
-            loginUsername.value = savedUser.username;
-            loginPassword.value = '';
-            loginPassword.focus();
-            loginInterface.style.display = 'flex';
+        function closeModal() {
+            document.getElementById("appModal").classList.remove("show");
         }
+
+        document.getElementById("appModal").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function openDetailModal() {
+            document.getElementById("detailModal").classList.add("show");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.remove("show");
+        }
+
+        document.getElementById("detailModal").addEventListener("click", function(e) {
+            if (e.target === this) closeDetailModal();
+        });
+
+        function showPage(pageName) {
+            document.querySelectorAll(".page").forEach(function(p) {
+                p.classList.remove("active");
+            });
+            document.getElementById("page-" + pageName).classList.add("active");
+
+            document.querySelectorAll(".nav-links a").forEach(function(a) {
+                a.classList.remove("active");
+                if (a.getAttribute("data-page") === pageName) a.classList.add("active");
+            });
+        }
+
+        // ==================== 程序启动 ====================
+        renderApps();
     </script>
+
 </body>
 </html>
